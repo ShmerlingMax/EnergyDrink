@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:energy_drink/domain/models/energy_drink_model/energy_drink_model.dart';
+import '../energy_drink_model/energy_drink_model.dart';
 
 part 'shop_model.g.dart';
 

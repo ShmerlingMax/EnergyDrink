@@ -1,5 +1,8 @@
+import 'package:energy_drink/data/api/api.dart';
+import 'package:energy_drink/domain/models/aggregation_model/aggregation_model.dart';
 import 'package:energy_drink/presentation/main_screen/main_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,7 +23,19 @@ class MyApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      home: const MainScreen(),
+      home: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (_) => Aggregation(
+              [],
+              [],
+              SortingParameter.price,
+              SortingDirection.ascending,
+            ),
+          ),
+        ],
+        child: const MainScreen(),
+      ),
     );
   }
 }

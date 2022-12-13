@@ -20,8 +20,7 @@ class MainScreen extends StatelessWidget {
         body: SafeArea(
           child: FutureBuilder(
             future: Future.wait([shops, brands]),
-            builder:
-                (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
               if (snapshot.hasData) {
                 final List<String> shopsStr = [];
                 for (int i = 0; i < snapshot.data[0].length; i++) {
@@ -34,12 +33,14 @@ class MainScreen extends StatelessWidget {
                   SortingDirection.ascending,
                 );
                 final drinks = aggragation.sort(snapshot.data[0]);
+                final itemWidth = MediaQuery.of(context).size.width / 3;
+                final itemHeight = MediaQuery.of(context).size.height / 4.5;
                 return GridView.builder(
                   shrinkWrap: true,
                   itemCount: drinks.length,
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
+                    childAspectRatio: itemWidth / itemHeight,
                   ),
                   itemBuilder: (context, index) => Item(
                     drinks[index],

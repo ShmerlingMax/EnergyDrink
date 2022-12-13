@@ -1,10 +1,13 @@
+import 'package:energy_drink/domain/models/aggregation_model/aggregation_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class MainAppBar extends StatelessWidget with PreferredSizeWidget {
   const MainAppBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var controller = TextEditingController();
     return SafeArea(
       child: Row(
         children: [
@@ -31,10 +34,15 @@ class MainAppBar extends StatelessWidget with PreferredSizeWidget {
                   const SizedBox(width: 20),
                   Expanded(
                     child: TextFormField(
+                      controller: controller,
                       decoration: const InputDecoration(
                         hintText: 'Поиск',
                         border: InputBorder.none,
                       ),
+                      onEditingComplete: () {
+                        context.read<Aggregation>().search = controller.text;
+                        FocusManager.instance.primaryFocus?.unfocus();
+                      },
                     ),
                   ),
                   const SizedBox(width: 10),

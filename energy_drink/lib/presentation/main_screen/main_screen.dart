@@ -1,5 +1,6 @@
 import 'package:energy_drink/data/api/api.dart';
 import 'package:energy_drink/domain/models/aggregation_model/aggregation_model.dart';
+import 'package:energy_drink/domain/models/settings_model/settings_model.dart';
 import 'package:energy_drink/domain/models/shop_model/shop_model.dart';
 import 'package:energy_drink/presentation/main_screen/widgets/item.dart';
 import 'package:flutter/material.dart';
@@ -35,12 +36,14 @@ class _MainScreenState extends State<MainScreen> {
             future: Future.wait([shops, brands]),
             builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
               if (snapshot.hasData) {
-                final List<String> shopsStr = [];
-                for (int i = 0; i < snapshot.data[0].length; i++) {
-                  shopsStr.add(snapshot.data[0][i].name);
+                if (context.read<Aggregation>().isNotInit) {
+                  final List<String> shopsStr = [];
+                  for (int i = 0; i < snapshot.data[0].length; i++) {
+                    shopsStr.add(snapshot.data[0][i].name);
+                  }
+                  context.read<Aggregation>().init(shopsStr, snapshot.data[1]);
+                  context.read<Settings>().init(shopsStr, snapshot.data[1]);
                 }
-                context.read<Aggregation>().shops = shopsStr;
-                context.read<Aggregation>().brands = snapshot.data[1];
                 final drinks =
                     context.watch<Aggregation>().sort(snapshot.data[0]);
                 final itemWidth = MediaQuery.of(context).size.width / 3;

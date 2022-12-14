@@ -14,34 +14,37 @@ enum SortingDirection {
 }
 
 class Aggregation with ChangeNotifier {
-  List<String> _shops;
-  List<String> _brands;
+  final List<String> _shops;
+  final List<String> _brands;
   SortingParameter _sortingParameter;
   SortingDirection _sortingDirection;
   String _search = '';
+  List<String> _currentShops;
+  List<String> _currentBrands;
 
   Aggregation(
     this._shops,
     this._brands,
-    this._sortingParameter,
-    this._sortingDirection,
-  );
+  )   : _sortingParameter = SortingParameter.discount,
+        _sortingDirection = SortingDirection.descending,
+        _currentShops = _shops,
+        _currentBrands = _brands;
 
-  List<String> get shops => _shops;
-  List<String> get brands => _brands;
+  List<String> get shops => _currentShops;
+  List<String> get brands => _currentBrands;
   SortingParameter get sortingParameter => _sortingParameter;
   SortingDirection get sortingDirection => _sortingDirection;
   String get search => _search;
 
   set shops(List<String> value) {
-    _shops = value;
+    _currentShops = value;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       notifyListeners();
     });
   }
 
   set brands(List<String> value) {
-    _brands = value;
+    _currentBrands = value;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       notifyListeners();
     });
@@ -71,9 +74,9 @@ class Aggregation with ChangeNotifier {
   List<MapEntry<EnergyDrink, Image>> sort(List<Shop> shops) {
     List<MapEntry<EnergyDrink, Image>> drinks = [];
     for (int i = 0; i < shops.length; i++) {
-      if (!_shops.contains(shops[i].name)) continue;
+      if (!_currentShops.contains(shops[i].name)) continue;
       for (int j = 0; j < shops[i].energyDrinks.length; j++) {
-        if (_brands.contains(shops[i].energyDrinks[j].brand) &&
+        if (_currentBrands.contains(shops[i].energyDrinks[j].brand) &&
             shops[i]
                 .energyDrinks[j]
                 .fullName
@@ -86,28 +89,36 @@ class Aggregation with ChangeNotifier {
     if (_sortingParameter == SortingParameter.price) {
       if (_sortingDirection == SortingDirection.ascending) {
         drinks.sort(
-          (drink1, drink2) => drink1.key.priceWithDiscount
-              .compareTo(drink2.key.priceWithDiscount),
+          (drink1, drink2) => drink2.key.priceWithDiscount
+              .compareTo(drink1.key.priceWithDiscount),
         );
       } else {
         drinks.sort(
-          (drink1, drink2) => drink1.key.priceWithDiscount
-              .compareTo(drink2.key.priceWithDiscount),
+          (drink1, drink2) => drink2.key.priceWithDiscount
+              .compareTo(drink1.key.priceWithDiscount),
         );
       }
     } else {
       if (_sortingDirection == SortingDirection.ascending) {
         drinks.sort(
           (drink1, drink2) =>
-              drink1.key.discount.compareTo(drink2.key.discount),
+              drink2.key.discount.compareTo(drink1.key.discount),
         );
       } else {
         drinks.sort(
           (drink1, drink2) =>
-              drink1.key.discount.compareTo(drink2.key.discount),
+              drink2.key.discount.compareTo(drink1.key.discount),
         );
       }
     }
     return drinks;
+  }
+
+  void reset() {
+    _currentBrands = _brands;
+    _currentShops = _shops;
+    _sortingParameter = SortingParameter.discount;
+    _sortingDirection = SortingDirection.descending;
+    notifyListeners();
   }
 }

@@ -1,4 +1,5 @@
 import 'package:energy_drink/domain/models/aggregation_model/aggregation_model.dart';
+import 'package:energy_drink/presentation/settings_screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -53,7 +54,14 @@ class MainAppBar extends StatelessWidget with PreferredSizeWidget {
           Flexible(
             flex: 2,
             child: GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
+                  ),
+                );
+              },
               child: Container(
                 height: 60,
                 decoration: const BoxDecoration(

@@ -1,4 +1,5 @@
 import 'package:energy_drink/domain/models/aggregation_model/aggregation_model.dart';
+import 'package:energy_drink/domain/models/settings_model/settings_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,6 +15,13 @@ class SettingsAppBar extends StatelessWidget with PreferredSizeWidget {
           IconButton(
             onPressed: () {
               Navigator.pop(context);
+              final aggregation = context.read<Aggregation>();
+              context.read<Settings>().reset(
+                    aggregation.shops,
+                    aggregation.brands,
+                    aggregation.sortingParameter,
+                    aggregation.sortingDirection,
+                  );
             },
             icon: const Icon(Icons.arrow_back),
           ),
@@ -27,7 +35,13 @@ class SettingsAppBar extends StatelessWidget with PreferredSizeWidget {
             color: const Color(0xFFB2C2D7),
             child: TextButton(
               onPressed: () {
-                context.read<Aggregation>().reset();
+                final aggregation = context.read<Aggregation>();
+                context.read<Settings>().reset(
+                      aggregation.allShops,
+                      aggregation.allBrands,
+                      SortingParameter.discount,
+                      SortingDirection.descending,
+                    );
               },
               child: const Text(
                 'Сбросить',

@@ -1,4 +1,5 @@
 import 'package:energy_drink/domain/models/aggregation_model/aggregation_model.dart';
+import 'package:energy_drink/domain/models/settings_model/settings_model.dart';
 import 'package:energy_drink/presentation/main_screen/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,10 +16,10 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => Aggregation(
-            [],
-            [],
-          ),
+          create: (_) => Aggregation(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => Settings(),
         ),
       ],
       child: MaterialApp(

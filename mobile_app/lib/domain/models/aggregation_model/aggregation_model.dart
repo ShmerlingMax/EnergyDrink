@@ -14,61 +14,56 @@ enum SortingDirection {
 }
 
 class Aggregation with ChangeNotifier {
-  final List<String> _shops;
-  final List<String> _brands;
-  SortingParameter _sortingParameter;
-  SortingDirection _sortingDirection;
+  List<String> _shops = [];
+  List<String> _brands = [];
+  SortingParameter _sortingParameter = SortingParameter.discount;
+  SortingDirection _sortingDirection = SortingDirection.descending;
   String _search = '';
-  List<String> _currentShops;
-  List<String> _currentBrands;
-
-  Aggregation(
-    this._shops,
-    this._brands,
-  )   : _sortingParameter = SortingParameter.discount,
-        _sortingDirection = SortingDirection.descending,
-        _currentShops = _shops,
-        _currentBrands = _brands;
+  List<String> _currentShops = [];
+  List<String> _currentBrands = [];
 
   List<String> get shops => _currentShops;
   List<String> get brands => _currentBrands;
   SortingParameter get sortingParameter => _sortingParameter;
   SortingDirection get sortingDirection => _sortingDirection;
   String get search => _search;
+  bool get isNotInit => _shops.isEmpty;
+  List<String> get allShops => _shops;
+  List<String> get allBrands => _brands;
 
-  set shops(List<String> value) {
-    _currentShops = value;
+  void init(List<String> shops, List<String> brands) {
+    _shops = shops;
+    _brands = brands;
+    _currentShops = shops;
+    _currentBrands = brands;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       notifyListeners();
     });
+  }
+
+  set shops(List<String> value) {
+    _currentShops = value;
+    notifyListeners();
   }
 
   set brands(List<String> value) {
     _currentBrands = value;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      notifyListeners();
-    });
+    notifyListeners();
   }
 
   set sortingParameter(SortingParameter value) {
     _sortingParameter = value;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      notifyListeners();
-    });
+    notifyListeners();
   }
 
   set sortingDirection(SortingDirection value) {
     _sortingDirection = value;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      notifyListeners();
-    });
+    notifyListeners();
   }
 
   set search(String value) {
     _search = value;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      notifyListeners();
-    });
+    notifyListeners();
   }
 
   List<MapEntry<EnergyDrink, Image>> sort(List<Shop> shops) {
@@ -112,13 +107,5 @@ class Aggregation with ChangeNotifier {
       }
     }
     return drinks;
-  }
-
-  void reset() {
-    _currentBrands = _brands;
-    _currentShops = _shops;
-    _sortingParameter = SortingParameter.discount;
-    _sortingDirection = SortingDirection.descending;
-    notifyListeners();
   }
 }

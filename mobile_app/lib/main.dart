@@ -1,4 +1,5 @@
 import 'package:energy_drink/domain/models/aggregation_model/aggregation_model.dart';
+import 'package:energy_drink/domain/models/selection_model/selection_model.dart';
 import 'package:energy_drink/domain/models/settings_model/settings_model.dart';
 import 'package:energy_drink/presentation/main_screen/main_screen.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => Settings(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => SelectionModel(),
         ),
       ],
       child: MaterialApp(

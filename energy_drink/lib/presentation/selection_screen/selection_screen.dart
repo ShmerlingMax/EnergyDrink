@@ -1,5 +1,6 @@
 import 'package:energy_drink/domain/models/aggregation_model/aggregation_model.dart';
 import 'package:energy_drink/domain/models/selection_model/selection_model.dart';
+import 'package:energy_drink/domain/models/settings_model/settings_model.dart';
 import 'package:energy_drink/presentation/selection_screen/widgets/app_bar.dart';
 import 'package:energy_drink/presentation/selection_screen/widgets/item.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +37,33 @@ class SelectionScreen extends StatelessWidget {
                 },
               ),
             ),
-          )
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: GestureDetector(
+              onTap: () {
+                if (isShops) {
+                  context.read<Settings>().shops =
+                      context.read<SelectionModel>().shops.toList();
+                } else {
+                  context.read<Settings>().brands =
+                      context.read<SelectionModel>().brands.toList();
+                }
+                Navigator.pop(context);
+              },
+              child: Container(
+                width: 160,
+                height: 120,
+                color: const Color(0xFFB2C2D7),
+                child: const Center(
+                  child: Text(
+                    'Применить',
+                    style: TextStyle(fontSize: 25),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

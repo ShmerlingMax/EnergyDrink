@@ -84,7 +84,7 @@ class Aggregation with ChangeNotifier {
     if (_sortingParameter == SortingParameter.price) {
       if (_sortingDirection == SortingDirection.ascending) {
         drinks.sort(
-          (drink1, drink2) => drink2.key.priceWithDiscount
+          (drink2, drink1) => drink2.key.priceWithDiscount
               .compareTo(drink1.key.priceWithDiscount),
         );
       } else {
@@ -96,7 +96,7 @@ class Aggregation with ChangeNotifier {
     } else {
       if (_sortingDirection == SortingDirection.ascending) {
         drinks.sort(
-          (drink1, drink2) =>
+          (drink2, drink1) =>
               drink2.key.discount.compareTo(drink1.key.discount),
         );
       } else {

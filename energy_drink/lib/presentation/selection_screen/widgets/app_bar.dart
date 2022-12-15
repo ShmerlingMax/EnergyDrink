@@ -1,3 +1,5 @@
+import 'package:energy_drink/domain/models/selection_model/selection_model.dart';
+import 'package:energy_drink/domain/models/settings_model/settings_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +15,12 @@ class SelectionAppBar extends StatelessWidget with PreferredSizeWidget {
         children: [
           IconButton(
             onPressed: () {
+              final settings = context.read<Settings>();
+              if (isShops) {
+                context.read<SelectionModel>().shops = settings.shops.toList();
+              } else {
+                context.read<SelectionModel>().brands = settings.brands.toList();
+              }
               Navigator.pop(context);
             },
             icon: const Icon(Icons.arrow_back),

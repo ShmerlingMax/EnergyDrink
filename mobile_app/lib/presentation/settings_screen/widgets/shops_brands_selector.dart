@@ -1,4 +1,5 @@
 import 'package:energy_drink/domain/models/settings_model/settings_model.dart';
+import 'package:energy_drink/presentation/selection_screen/selection_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -32,7 +33,14 @@ class ShopsBrandsSelector extends StatelessWidget {
               color: const Color(0xFFB2C2D7),
               height: 32,
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SelectionScreen(isShops),
+                    ),
+                  );
+                },
                 child: const Padding(
                   padding: EdgeInsets.only(
                     left: 10,

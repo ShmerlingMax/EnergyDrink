@@ -41,8 +41,8 @@ class _MainScreenState extends State<MainScreen> {
                   for (int i = 0; i < snapshot.data[0].length; i++) {
                     shopsStr.add(snapshot.data[0][i].name);
                   }
-                  context.read<Aggregation>().init(shopsStr, snapshot.data[1]);
-                  context.read<Settings>().init(shopsStr, snapshot.data[1]);
+                  context.read<Aggregation>().init(shopsStr.toList(), snapshot.data[1].toList());
+                  context.read<Settings>().init(shopsStr.toList(), snapshot.data[1].toList());
                 }
                 final drinks =
                     context.watch<Aggregation>().sort(snapshot.data[0]);

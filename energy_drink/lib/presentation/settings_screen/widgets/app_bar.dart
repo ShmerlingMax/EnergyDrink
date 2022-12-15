@@ -17,8 +17,8 @@ class SettingsAppBar extends StatelessWidget with PreferredSizeWidget {
               Navigator.pop(context);
               final aggregation = context.read<Aggregation>();
               context.read<Settings>().reset(
-                    aggregation.shops,
-                    aggregation.brands,
+                    aggregation.shops.toList(),
+                    aggregation.brands.toList(),
                     aggregation.sortingParameter,
                     aggregation.sortingDirection,
                   );
@@ -37,8 +37,8 @@ class SettingsAppBar extends StatelessWidget with PreferredSizeWidget {
               onPressed: () {
                 final aggregation = context.read<Aggregation>();
                 context.read<Settings>().reset(
-                      aggregation.allShops,
-                      aggregation.allBrands,
+                      aggregation.allShops.toList(),
+                      aggregation.allBrands.toList(),
                       SortingParameter.discount,
                       SortingDirection.descending,
                     );

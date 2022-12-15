@@ -1,5 +1,6 @@
 import 'package:energy_drink/presentation/settings_screen/widgets/app_bar.dart';
 import 'package:energy_drink/presentation/settings_screen/widgets/save_button.dart';
+import 'package:energy_drink/presentation/settings_screen/widgets/shops_brands_selector.dart';
 import 'package:energy_drink/presentation/settings_screen/widgets/sorting_direction_selector.dart';
 import 'package:energy_drink/presentation/settings_screen/widgets/sorting_parameter_selector.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +38,14 @@ class SettingsScreen extends StatelessWidget {
                       SortingDirectionSelector(),
                     ],
                   ),
+                  const SizedBox(
+                    height: 60,
+                  ),
+                  const ShopsBrandsSelector(true),
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  const ShopsBrandsSelector(false),
                 ],
               ),
             ),

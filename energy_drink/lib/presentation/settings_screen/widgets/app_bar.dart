@@ -14,7 +14,6 @@ class SettingsAppBar extends StatelessWidget with PreferredSizeWidget {
         children: [
           IconButton(
             onPressed: () {
-              Navigator.pop(context);
               final aggregation = context.read<Aggregation>();
               context.read<Settings>().reset(
                     aggregation.shops.toList(),
@@ -22,6 +21,7 @@ class SettingsAppBar extends StatelessWidget with PreferredSizeWidget {
                     aggregation.sortingParameter,
                     aggregation.sortingDirection,
                   );
+              Navigator.pop(context);
             },
             icon: const Icon(Icons.arrow_back),
           ),

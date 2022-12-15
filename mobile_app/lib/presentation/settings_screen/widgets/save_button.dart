@@ -14,8 +14,8 @@ class SaveButton extends StatelessWidget {
         onTap: () {
           final settings = context.read<Settings>();
           context.read<Aggregation>()
-            ..shops = settings.shops
-            ..brands = settings.brands
+            ..shops = settings.shops.toList()
+            ..brands = settings.brands.toList()
             ..sortingParameter = settings.sortingParameter
             ..sortingDirection = settings.sortingDirection;
           Navigator.pop(context);

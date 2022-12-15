@@ -3,6 +3,7 @@ plugins {
     id 'application'
     id 'net.ltgt.errorprone' version '2.0.2'
     id 'checkstyle'
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 java {
@@ -21,30 +22,25 @@ version '1.0-SNAPSHOT'
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-    // Checks
     errorprone 'com.google.errorprone:error_prone_core:2.15.0'
     checkstyle 'com.puppycrawl.tools:checkstyle:10.3.3'
 
-    // Logging
     implementation 'org.slf4j:slf4j-api:2.0.0'
     implementation 'ch.qos.logback:logback-classic:1.4.0'
-    // As one-nio uses log4j directly
     implementation 'org.slf4j:log4j-over-slf4j:2.0.0'
 
-    // Annotations for better code documentation
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
-    // Our beloved one-nio
     implementation 'ru.odnoklassniki:one-nio:1.5.0'
 
-    // LevelDB
     implementation group: 'org.iq80.leveldb', name: 'leveldb', version: '0.12'
 
-    //implementation 'jdk.incubator.foreign'
 
     implementation 'org.rocksdb:rocksdbjni:7.5.3'
 
-    // JUnit Jupiter test framework
+    // https://mvnrepository.com/artifact/org.mongodb/mongo-java-driver
+    implementation group: 'org.mongodb', name: 'mongo-java-driver', version: '3.12.11'
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
@@ -53,8 +49,7 @@ dependencies {
 def incubatorArgs = ["--add-modules", "jdk.incubator.foreign"]
 
 application {
-    mainClass = 'ok.dht.test.dergunov.Server'
-    applicationDefaultJvmArgs = ['-Xmx128m'] + incubatorArgs
+    mainClass = 'server.Server'
 }
 
 test {
@@ -62,8 +57,28 @@ test {
     useJUnitPlatform()
 }
 
+configurations {
+    extraLibs
+}
+
 run {
     application
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "server.Server"
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+shadowJar {
+    archiveBaseName.set("shadow")
+    archiveClassifier.set('')
+    archiveVersion.set('')
 }
 
 checkstyle {

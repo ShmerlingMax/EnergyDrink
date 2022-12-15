@@ -1,9 +1,7 @@
 package server;
 
-import jdk.incubator.foreign.MemorySegment;
-import ok.dht.test.dergunov.database.BaseEntry;
-import ok.dht.test.dergunov.database.Entry;
-import ok.dht.test.dergunov.database.MemorySegmentDao;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import one.nio.http.HttpServer;
 import one.nio.http.HttpServerConfig;
 import one.nio.http.HttpSession;
@@ -13,17 +11,13 @@ import one.nio.http.RequestHandler;
 import one.nio.http.Response;
 import one.nio.net.Session;
 import one.nio.server.SelectorThread;
-import one.nio.util.Utf8;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bson.Document;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.HashSet;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -31,7 +25,8 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static ok.dht.test.dergunov.ConverterStatusCode.fromHttpResponseStatusJavaToOneNoi;
+import static com.mongodb.client.model.Sorts.ascending;
+import static com.mongodb.client.model.Sorts.descending;
 import static one.nio.http.Request.METHOD_DELETE;
 import static one.nio.http.Request.METHOD_GET;
 import static one.nio.http.Request.METHOD_PUT;
@@ -39,8 +34,8 @@ import static one.nio.http.Request.METHOD_PUT;
 public class HttpServerImpl extends HttpServer {
 
     private static final Log LOGGER = LogFactory.getLog(HttpServerImpl.class);
-    private static final String PATH = "/v0/entity";
-    private static final String PARAMETER_KEY = "id=";
+    private static final String PATH_BRANDS = "/brands";
+    private static final String PATH_SHOPS = "/shops";
 
     private static final int SIZE_QUEUE = 128;
     private static final int COUNT_CORES = 4;
@@ -49,7 +44,7 @@ public class HttpServerImpl extends HttpServer {
     private static final Response BAD_RESPONSE = new Response(Response.BAD_REQUEST, Response.EMPTY);
     private static final Response METHOD_NOT_ALLOWED = new Response(Response.METHOD_NOT_ALLOWED, Response.EMPTY);
     private static final Response SERVICE_UNAVAILABLE = new Response(Response.SERVICE_UNAVAILABLE, Response.EMPTY);
-    private final MemorySegmentDao database;
+    private final MongoDatabase database;
     private final PathMapper handlerMapper = new PathMapper();
 
     private final ExecutorService poolExecutor = new ThreadPoolExecutor(
@@ -60,34 +55,12 @@ public class HttpServerImpl extends HttpServer {
             new LinkedBlockingQueue<>(SIZE_QUEUE)
     );
 
-    private final HttpClient httpClient;
-    private final String selfUrl;
-    private final Set<String> illNodes = new HashSet<>();
-    private final ShardMapper shardMapper;
-
-    public HttpServerImpl(HttpServerConfig httpServerConfig, MemorySegmentDao database, String selfUrl,
-                          ShardMapper shardMapper,
+    public HttpServerImpl(HttpServerConfig httpServerConfig, MongoDatabase database,
                           Object... routers) throws IOException {
         super(httpServerConfig, routers);
         this.database = database;
-        this.selfUrl = selfUrl;
-        this.shardMapper = shardMapper;
-        handlerMapper.add(PATH, new int[]{METHOD_GET}, this::handleGet);
-        handlerMapper.add(PATH, new int[]{METHOD_PUT}, this::handlePut);
-        handlerMapper.add(PATH, new int[]{METHOD_DELETE}, this::handleDelete);
-        httpClient = HttpClient.newHttpClient();
-    }
-
-    private static byte[] toBytes(MemorySegment data) {
-        return data == null ? null : data.toByteArray();
-    }
-
-    private static MemorySegment fromString(String data) {
-        return data == null ? null : MemorySegment.ofArray(Utf8.toBytes(data));
-    }
-
-    private static MemorySegment fromBytes(byte[] data) {
-        return data == null ? null : MemorySegment.ofArray(data);
+        handlerMapper.add(PATH_BRANDS, new int[]{METHOD_GET}, this::handleGetBrands);
+        handlerMapper.add(PATH_SHOPS, new int[]{METHOD_GET}, this::handleGetShops);
     }
 
     @Override
@@ -122,59 +95,29 @@ public class HttpServerImpl extends HttpServer {
         poolExecutor.execute(() -> {
             try {
                 String path = request.getPath();
-                if (!path.equals(PATH)) {
+                System.out.println(path);
+                if (!path.equals(PATH_BRANDS) && !path.equals(PATH_SHOPS)) {
                     session.sendResponse(BAD_RESPONSE);
                     return;
                 }
                 int methodName = request.getMethod();
+                System.out.println(methodName);
                 if (!SUPPORTED_METHODS.contains(methodName)) {
                     session.sendResponse(METHOD_NOT_ALLOWED);
                     return;
                 }
 
-                String key = getEntityId(request, session);
-                if (key == null) return;
-                String url = shardMapper.getShardByKey(key);
-
-                if (url.equals(selfUrl)) {
-                    RequestHandler handler = handlerMapper.find(path, methodName);
-                    if (handler != null) {
-                        handler.handleRequest(request, session);
-                        return;
-                    }
-                    handleDefault(request, session);
+                RequestHandler handler = handlerMapper.find(path, methodName);
+                if (handler != null) {
+                    handler.handleRequest(request, session);
                     return;
                 }
+                handleDefault(request, session);
 
-                if (illNodes.contains(url)) {
-                    LOGGER.error("Error when send response (node ill) url : " + url);
-                    handleUnavailable(session);
-                    return;
-                }
-
-                proxy(request, session, url);
             } catch (IOException e) {
                 handleUnavailable(session);
             }
         });
-    }
-
-    private void proxy(Request request, HttpSession session, String url) throws IOException {
-        HttpRequest proxyRequest = HttpRequest.newBuilder(URI.create(url + request.getURI()))
-                        .method(request.getMethodName(),
-                                HttpRequest.BodyPublishers.ofByteArray(request.getBody()))
-                .build();
-
-        try {
-            HttpResponse<byte[]> httpResponse = httpClient
-                    .send(proxyRequest, HttpResponse.BodyHandlers.ofByteArray());
-            session.sendResponse(new Response(fromHttpResponseStatusJavaToOneNoi(httpResponse.statusCode()),
-                            httpResponse.body()));
-        } catch (Exception e) {
-            illNodes.add(url);
-            LOGGER.error("Error when send response (node ill) url : " + url);
-            handleUnavailable(session);
-        }
     }
 
     @Override
@@ -188,41 +131,45 @@ public class HttpServerImpl extends HttpServer {
         poolExecutor.shutdown();
     }
 
-    private void handleGet(@Nonnull Request request, HttpSession session) throws IOException {
-        String entityId = getEntityId(request, session);
-        if (entityId == null) return;
+    private void handleGetShops(@Nonnull Request request, HttpSession session) throws IOException {
+        MongoCollection<Document> brands = database.getCollection(CollectionsMongoDb.SHOPS.name);
+        handleGetFromMongo(session, brands);
+    }
 
-        Entry<MemorySegment> result = database.get(fromString(entityId));
-        if (result == null) {
+    private void handleGetBrands(@Nonnull Request request, HttpSession session) throws IOException {
+        System.out.println("here");
+
+        MongoCollection<Document> brands = database.getCollection(CollectionsMongoDb.BRANDS.name);
+        System.out.println(brands.find().first());
+
+        handleGetFromMongo(session, brands);
+    }
+
+    private void handleGetFromMongo(HttpSession session, MongoCollection<Document> brands) throws IOException {
+        Document doc = brands.find()
+                .sort(descending("id"))
+                .limit(1)
+                .first();
+
+        System.out.println(doc);
+        if (doc == null || doc.isEmpty()) {
             session.sendResponse(new Response(Response.NOT_FOUND, Response.EMPTY));
             return;
         }
-        session.sendResponse(new Response(Response.OK, toBytes(result.value())));
+
+        String brandJson = doc.getString("json");
+        System.out.println(brandJson);
+        session.sendResponse(new Response(Response.OK, brandJson.getBytes(StandardCharsets.UTF_8)));
     }
 
-    private void handlePut(@Nonnull Request request, HttpSession session) throws IOException {
-        String entityId = getEntityId(request, session);
-        if (entityId == null) return;
+    enum CollectionsMongoDb {
+        BRANDS("brands"),
+        SHOPS("shops");
 
-        database.upsert(new BaseEntry<>(fromString(entityId), fromBytes(request.getBody())));
-        session.sendResponse(new Response(Response.CREATED, Response.EMPTY));
-    }
-
-    private void handleDelete(@Nonnull Request request, HttpSession session) throws IOException {
-        String entityId = getEntityId(request, session);
-        if (entityId == null) return;
-
-        database.upsert(new BaseEntry<>(fromString(entityId), null));
-        session.sendResponse(new Response(Response.ACCEPTED, Response.EMPTY));
-    }
-
-    private static String getEntityId(Request request, HttpSession session) throws IOException {
-        String entityId = request.getParameter(PARAMETER_KEY, "");
-        if (entityId.isEmpty()) {
-            session.sendResponse(BAD_RESPONSE);
-            return null;
+        final String name;
+        CollectionsMongoDb(String name) {
+            this.name = name;
         }
-        return entityId;
     }
 
 }

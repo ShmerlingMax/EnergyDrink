@@ -1,3 +1,4 @@
+import 'package:energy_drink/domain/models/selection_model/selection_model.dart';
 import 'package:energy_drink/domain/models/settings_model/settings_model.dart';
 import 'package:energy_drink/presentation/selection_screen/selection_screen.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +35,11 @@ class ShopsBrandsSelector extends StatelessWidget {
               height: 32,
               child: GestureDetector(
                 onTap: () {
+                  final settings = context.read<Settings>();
+                  context.read<SelectionModel>().init(
+                        settings.shops.toList(),
+                        settings.brands.toList(),
+                      );
                   Navigator.push(
                     context,
                     MaterialPageRoute(

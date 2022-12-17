@@ -14,11 +14,10 @@ class SelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: SelectionAppBar(isShops),
-      body: Stack(
+      body: Column(
         children: [
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 34),
+          Flexible(
+            child: Center(
               child: ListView.builder(
                 itemCount: (isShops
                         ? context.read<Aggregation>().allShops.length
@@ -26,13 +25,19 @@ class SelectionScreen extends StatelessWidget {
                     1,
                 itemBuilder: (context, index) {
                   if (index == 0) {
-                    return SelectAll(isShops);
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 34),
+                      child: SelectAll(isShops),
+                    );
                   }
-                  return SelectionItem(
-                    isShops,
-                    isShops
-                        ? context.read<Aggregation>().allShops[index - 1]
-                        : context.read<Aggregation>().allBrands[index - 1],
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 34),
+                    child: SelectionItem(
+                      isShops,
+                      isShops
+                          ? context.read<Aggregation>().allShops[index - 1]
+                          : context.read<Aggregation>().allBrands[index - 1],
+                    ),
                   );
                 },
               ),
@@ -41,20 +46,26 @@ class SelectionScreen extends StatelessWidget {
           Align(
             alignment: Alignment.bottomRight,
             child: GestureDetector(
-              onTap: () {
-                if (isShops) {
-                  context.read<Settings>().shops =
-                      context.read<SelectionModel>().shops.toList();
-                } else {
-                  context.read<Settings>().brands =
-                      context.read<SelectionModel>().brands.toList();
-                }
-                Navigator.pop(context);
-              },
+              onTap: (context.watch<SelectionModel>().shops.isEmpty ||
+                      context.watch<SelectionModel>().brands.isEmpty)
+                  ? null
+                  : () {
+                      if (isShops) {
+                        context.read<Settings>().shops =
+                            context.read<SelectionModel>().shops.toList();
+                      } else {
+                        context.read<Settings>().brands =
+                            context.read<SelectionModel>().brands.toList();
+                      }
+                      Navigator.pop(context);
+                    },
               child: Container(
                 width: 160,
                 height: 120,
-                color: const Color(0xFFB2C2D7),
+                color: (context.watch<SelectionModel>().shops.isEmpty ||
+                        context.watch<SelectionModel>().brands.isEmpty)
+                    ? const Color(0xFF6F6F6F)
+                    : const Color(0xFFB2C2D7),
                 child: const Center(
                   child: Text(
                     'Применить',

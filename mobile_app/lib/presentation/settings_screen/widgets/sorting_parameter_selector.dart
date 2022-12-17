@@ -11,28 +11,36 @@ class SortingParameterSelector extends StatelessWidget {
     return Column(
       children: [
         Flexible(
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('цена'),
-            leading: Radio<SortingParameter>(
-              value: SortingParameter.price,
-              groupValue: context.watch<Settings>().sortingParameter,
-              onChanged: (SortingParameter? value) {
-                context.read<Settings>().sortingParameter = value!;
-              },
+          child: GestureDetector(
+            onTap: () => context.read<Settings>().sortingParameter =
+                SortingParameter.price,
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('цена'),
+              leading: Radio<SortingParameter>(
+                value: SortingParameter.price,
+                groupValue: context.watch<Settings>().sortingParameter,
+                onChanged: (SortingParameter? value) {
+                  context.read<Settings>().sortingParameter = value!;
+                },
+              ),
             ),
           ),
         ),
         Flexible(
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('скидка'),
-            leading: Radio<SortingParameter>(
-              value: SortingParameter.discount,
-              groupValue: context.watch<Settings>().sortingParameter,
-              onChanged: (SortingParameter? value) {
-                context.read<Settings>().sortingParameter = value!;
-              },
+          child: GestureDetector(
+            onTap: () => context.read<Settings>().sortingParameter =
+                SortingParameter.discount,
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('скидка'),
+              leading: Radio<SortingParameter>(
+                value: SortingParameter.discount,
+                groupValue: context.watch<Settings>().sortingParameter,
+                onChanged: (SortingParameter? value) {
+                  context.read<Settings>().sortingParameter = value!;
+                },
+              ),
             ),
           ),
         ),

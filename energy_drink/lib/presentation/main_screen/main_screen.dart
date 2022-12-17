@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:energy_drink/data/api/api.dart';
 import 'package:energy_drink/domain/models/aggregation_model/aggregation_model.dart';
 import 'package:energy_drink/domain/models/settings_model/settings_model.dart';
 import 'package:energy_drink/domain/models/shop_model/shop_model.dart';
+import 'package:energy_drink/domain/utils/internet_check.dart';
 import 'package:energy_drink/presentation/main_screen/widgets/item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
@@ -23,6 +26,8 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     shops = Api().getMockShops();
     brands = Api().getMockBrands();
+    _showError(context, brands);
+    _showWarning(context, brands);
     super.initState();
   }
 
@@ -92,5 +97,86 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
     );
+  }
+
+  void _showError(BuildContext context, Future<List<String>> brands) async {
+    final res = await brands;
+    final check = await hasInternet();
+    if (!check && res.isEmpty) {
+      await showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text(
+            'Ошибка соединения',
+            style: TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          content: const Text(
+            'Проверьте соединение с интернетом и попробуйте еще раз!',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/',
+                (_) => false,
+              ),
+              child: const Text(
+                'Попробовать',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  void _showWarning(BuildContext context, Future<List<String>> brands) async {
+    final res = await brands;
+    final check = await hasInternet();
+    if (!check && res.isNotEmpty) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text(
+            'Ошибка соединения',
+            style: TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          content: const Text(
+            'Включите интернет, чтобы получить актуальные данные о скидках!',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Ок',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }

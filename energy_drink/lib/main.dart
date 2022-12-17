@@ -1,3 +1,4 @@
+import 'package:energy_drink/data/services/shared_pref_service.dart';
 import 'package:energy_drink/domain/models/aggregation_model/aggregation_model.dart';
 import 'package:energy_drink/domain/models/selection_model/selection_model.dart';
 import 'package:energy_drink/domain/models/settings_model/settings_model.dart';
@@ -11,6 +12,7 @@ void main() async {
   await SystemChrome.setPreferredOrientations(
     [DeviceOrientation.portraitUp],
   );
+  await SharedPrefService.init();
   runApp(const MyApp());
 }
 

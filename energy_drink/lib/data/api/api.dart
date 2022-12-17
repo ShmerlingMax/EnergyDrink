@@ -1,7 +1,7 @@
-import 'dart:io';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:energy_drink/data/services/shared_pref_service.dart';
 import 'package:energy_drink/domain/models/shop_model/shop_model.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
@@ -33,8 +33,37 @@ class Api {
   }
 
   Future<List<Shop>> getShops() async {
-    //TODO заменить
-    final json = jsonDecode(await rootBundle.loadString('assets/shops.json'));
+    final time = SharedPrefService.get('timeShops');
+    dynamic json = [];
+    if (time != null &&
+        DateTime.now().difference(DateTime.parse(time)).inDays < 1) {
+      final res = SharedPrefService.get('shops');
+      if (res != null) {
+        json = jsonDecode(res);
+      } else {
+        try {
+          final response = await client.get(ApiConfig.shops);
+          SharedPrefService.save('shops', response.data);
+          SharedPrefService.save('timeShops', DateTime.now().toString());
+          json = jsonDecode(response.data);
+        } catch (e) {}
+      }
+    } else {
+      try {
+        final response = await client.get(ApiConfig.shops);
+        SharedPrefService.save('shops', response.data);
+        SharedPrefService.save('timeShops', DateTime.now().toString());
+        json = jsonDecode(response.data);
+      } catch (e) {
+        final res = SharedPrefService.get('shops');
+        if (res != null) {
+          json = jsonDecode(res);
+        }
+      }
+    }
+    if (json.isEmpty) {
+      return [];
+    }
     final shops = (json['shops'] as List<dynamic>)
         .map((e) => Shop.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -42,10 +71,54 @@ class Api {
   }
 
   Future<List<String>> getBrands() async {
-    //TODO заменить
-    final json = jsonDecode(await rootBundle.loadString('assets/brands.json'));
-    final brands = (json['brands'] as List<dynamic>).map((e) => e as String).toList();
+    final time = SharedPrefService.get('timeBrands');
+    dynamic json = [];
+    if (time != null &&
+        DateTime.now().difference(DateTime.parse(time)).inDays < 1) {
+      final res = SharedPrefService.get('brands');
+      if (res != null) {
+        json = jsonDecode(res);
+      } else {
+        try {
+          final response = await client.get(ApiConfig.brands);
+          SharedPrefService.save('brands', response.data);
+          SharedPrefService.save('timeBrands', DateTime.now().toString());
+          json = jsonDecode(response.data);
+        } catch (e) {}
+      }
+    } else {
+      try {
+        final response = await client.get(ApiConfig.brands);
+        SharedPrefService.save('brands', response.data);
+        SharedPrefService.save('timeBrands', DateTime.now().toString());
+        json = jsonDecode(response.data);
+      } catch (e) {
+        final res = SharedPrefService.get('brands');
+        if (res != null) {
+          json = jsonDecode(res);
+        }
+      }
+    }
+    if (json.isEmpty) {
+      return [];
+    }
+    final brands =
+        (json['brands'] as List<dynamic>).map((e) => e as String).toList();
+    return brands;
+  }
 
+  Future<List<Shop>> getMockShops() async {
+    final json = jsonDecode(await rootBundle.loadString('assets/shops.json'));
+    final shops = (json['shops'] as List<dynamic>)
+        .map((e) => Shop.fromJson(e as Map<String, dynamic>))
+        .toList();
+    return shops;
+  }
+
+  Future<List<String>> getMockBrands() async {
+    final json = jsonDecode(await rootBundle.loadString('assets/brands.json'));
+    final brands =
+        (json['brands'] as List<dynamic>).map((e) => e as String).toList();
     return brands;
   }
 }

@@ -10,7 +10,7 @@ class Item extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final itemWidth = MediaQuery.of(context).size.width / 3;
-    final itemHeight = MediaQuery.of(context).size.height / 4.7;
+    final itemHeight = MediaQuery.of(context).size.height / 5.2;
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -27,6 +27,7 @@ class Item extends StatelessWidget {
         ),
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
           SizedBox(
             width: itemWidth,

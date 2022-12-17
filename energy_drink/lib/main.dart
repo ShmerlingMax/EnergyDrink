@@ -4,8 +4,13 @@ import 'package:energy_drink/domain/models/settings_model/settings_model.dart';
 import 'package:energy_drink/presentation/main_screen/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations(
+    [DeviceOrientation.portraitUp],
+  );
   runApp(const MyApp());
 }
 

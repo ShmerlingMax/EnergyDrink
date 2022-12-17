@@ -4,6 +4,7 @@ import 'package:energy_drink/domain/models/settings_model/settings_model.dart';
 import 'package:energy_drink/domain/models/shop_model/shop_model.dart';
 import 'package:energy_drink/presentation/main_screen/widgets/item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:provider/provider.dart';
 
 import 'widgets/app_bar.dart';
@@ -41,30 +42,46 @@ class _MainScreenState extends State<MainScreen> {
                   for (int i = 0; i < snapshot.data[0].length; i++) {
                     shopsStr.add(snapshot.data[0][i].name);
                   }
-                  context.read<Aggregation>().init(shopsStr.toList(), snapshot.data[1].toList());
-                  context.read<Settings>().init(shopsStr.toList(), snapshot.data[1].toList());
+                  context
+                      .read<Aggregation>()
+                      .init(shopsStr.toList(), snapshot.data[1].toList());
+                  context
+                      .read<Settings>()
+                      .init(shopsStr.toList(), snapshot.data[1].toList());
                 }
                 final drinks =
                     context.watch<Aggregation>().sort(snapshot.data[0]);
-                final itemWidth = MediaQuery.of(context).size.width / 3;
-                final itemHeight = MediaQuery.of(context).size.height / 4.5;
                 if (drinks.isEmpty) {
                   return const Center(
                     child: Text('По вашему запросу ничего не найдено'),
                   );
                 }
-                return GridView.builder(
-                  shrinkWrap: true,
-                  itemCount: drinks.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: itemWidth / itemHeight,
-                  ),
-                  itemBuilder: (context, index) => Item(
-                    drinks[index],
-                    index,
+                return SingleChildScrollView(
+                  child: LayoutGrid(
+                    columnSizes: [1.fr, 1.fr],
+                    rowSizes: [
+                      for (var i = 0; i < drinks.length / 2; i++) auto
+                    ],
+                    children: [
+                      for (var i = 0; i < drinks.length; i++)
+                        Item(drinks[i], i),
+                    ],
                   ),
                 );
+                // final itemWidth = MediaQuery.of(context).size.width / 3;
+                // final itemHeight = MediaQuery.of(context).size.height / 4;
+                // return GridView.builder(
+                //   shrinkWrap: true,
+                //   itemCount: drinks.length,
+                //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                //     crossAxisCount: 2,
+                //     childAspectRatio: itemWidth / itemHeight,
+                //   ),
+                //   itemBuilder: (context, index) => Item(
+                //     drinks[index],
+                //     index,
+                //   ),
+                // );
               } else {
                 return const Center(
                   child: CircularProgressIndicator(),

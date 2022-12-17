@@ -26,7 +26,10 @@ class SettingsScreen extends StatelessWidget {
                       padding: EdgeInsets.only(left: 20),
                       child: Text(
                         'Параметры сортировки:',
-                        style: TextStyle(fontSize: 15),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                     Row(

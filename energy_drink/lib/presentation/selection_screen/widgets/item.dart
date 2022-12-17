@@ -51,7 +51,10 @@ class SelectionItem extends StatelessWidget {
                 ),
                 Text(
                   text,
-                  style: const TextStyle(fontSize: 15),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const Spacer(),
                 Checkbox(

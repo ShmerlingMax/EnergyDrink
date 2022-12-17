@@ -19,7 +19,8 @@ class SelectionAppBar extends StatelessWidget with PreferredSizeWidget {
               if (isShops) {
                 context.read<SelectionModel>().shops = settings.shops.toList();
               } else {
-                context.read<SelectionModel>().brands = settings.brands.toList();
+                context.read<SelectionModel>().brands =
+                    settings.brands.toList();
               }
               Navigator.pop(context);
             },
@@ -30,7 +31,10 @@ class SelectionAppBar extends StatelessWidget with PreferredSizeWidget {
           ),
           Text(
             isShops ? 'Магазины' : 'Бренды',
-            style: const TextStyle(fontSize: 20),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           const Spacer(
             flex: 9,

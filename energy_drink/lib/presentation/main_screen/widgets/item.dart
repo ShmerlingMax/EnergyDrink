@@ -12,6 +12,7 @@ class Item extends StatelessWidget {
     final itemWidth = MediaQuery.of(context).size.width / 3;
     final itemHeight = MediaQuery.of(context).size.height / 5.2;
     return Container(
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         border: Border(
           bottom: const BorderSide(
@@ -37,28 +38,53 @@ class Item extends StatelessWidget {
               child: energyDrink.key.image,
             ),
           ),
-          Text(energyDrink.key.fullName),
           const SizedBox(
-            height: 10,
+            height: 8,
+          ),
+          Align(
+            alignment: Alignment.topLeft,
+            child: Text(
+              energyDrink.key.fullName,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text('${energyDrink.key.priceWithDiscount} ₽'),
-              Text('${energyDrink.key.volume} мл'),
+              Text(
+                '${energyDrink.key.volume} мл',
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ],
           ),
-          const SizedBox(
-            height: 10,
+          const Spacer(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                '${energyDrink.key.priceWithDiscount} ₽',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
           Row(
             children: [
-              const SizedBox(
-                width: 10,
-              ),
               Text(
                 '${energyDrink.key.priceWithOutDiscount} ₽',
-                style: const TextStyle(decoration: TextDecoration.lineThrough),
+                style: const TextStyle(
+                  decoration: TextDecoration.lineThrough,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               const SizedBox(
                 width: 5,
@@ -67,6 +93,8 @@ class Item extends StatelessWidget {
                 '${(energyDrink.key.discount * 100).round()}% OFF',
                 style: const TextStyle(
                   color: Colors.red,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               const Spacer(),
@@ -75,14 +103,9 @@ class Item extends StatelessWidget {
                 height: 30,
                 child: energyDrink.value,
               ),
-              const SizedBox(
-                width: 5,
-              ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          const Spacer(),
         ],
       ),
     );

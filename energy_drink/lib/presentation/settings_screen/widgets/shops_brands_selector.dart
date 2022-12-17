@@ -21,7 +21,10 @@ class ShopsBrandsSelector extends StatelessWidget {
           padding: const EdgeInsets.only(left: 20),
           child: Text(
             isShops ? 'Магазины:' : 'Бренды: ',
-            style: const TextStyle(fontSize: 15),
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         const SizedBox(
@@ -56,7 +59,10 @@ class ShopsBrandsSelector extends StatelessWidget {
                   ),
                   child: Text(
                     'Добавить',
-                    style: TextStyle(fontSize: 14),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),
@@ -93,7 +99,10 @@ class _Item extends StatelessWidget {
             children: [
               Text(
                 text,
-                style: const TextStyle(fontSize: 14),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               GestureDetector(
                 onTap: () {

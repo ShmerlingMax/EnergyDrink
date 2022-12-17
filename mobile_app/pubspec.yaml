@@ -17,13 +17,14 @@ dependencies:
   dio: ^4.0.6
   provider: ^6.0.4
   flutter_layout_grid: ^2.0.1
-  flutter_launcher_icons: ^0.11.0
+  shared_preferences: ^2.0.15
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.11.0
   #flutter pub run build_runner build
   build_runner: ^2.3.2
   json_serializable: ^6.5.4

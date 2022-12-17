@@ -27,7 +27,10 @@ class SaveButton extends StatelessWidget {
           child: const Center(
             child: Text(
               'Сохранить',
-              style: TextStyle(fontSize: 25),
+              style: TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ),

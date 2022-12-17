@@ -69,7 +69,10 @@ class SelectionScreen extends StatelessWidget {
                 child: const Center(
                   child: Text(
                     'Применить',
-                    style: TextStyle(fontSize: 25),
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),
@@ -119,7 +122,10 @@ class SelectAll extends StatelessWidget {
             ),
             const Text(
               'Выбрать всё',
-              style: TextStyle(fontSize: 15),
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             const Spacer(),
             Checkbox(

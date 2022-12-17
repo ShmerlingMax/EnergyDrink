@@ -8,22 +8,25 @@ class SortingDirectionSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButton<SortingDirection>(
-      value: context.watch<Settings>().sortingDirection,
-      dropdownColor: const Color(0xFFB7D6FF),
-      items: const [
-        DropdownMenuItem(
-          value: SortingDirection.ascending,
-          child: Text('по возрастанию'),
-        ),
-        DropdownMenuItem(
-          value: SortingDirection.descending,
-          child: Text('по убыванию'),
-        ),
-      ],
-      onChanged: (value) {
-        context.read<Settings>().sortingDirection = value!;
-      },
+    return Expanded(
+      child: DropdownButton<SortingDirection>(
+        isExpanded: true,
+        value: context.watch<Settings>().sortingDirection,
+        dropdownColor: const Color(0xFFB7D6FF),
+        items: const [
+          DropdownMenuItem(
+            value: SortingDirection.ascending,
+            child: Text('по возрастанию'),
+          ),
+          DropdownMenuItem(
+            value: SortingDirection.descending,
+            child: Text('по убыванию'),
+          ),
+        ],
+        onChanged: (value) {
+          context.read<Settings>().sortingDirection = value!;
+        },
+      ),
     );
   }
 }

@@ -13,40 +13,42 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: const SettingsAppBar(),
       bottomSheet: const Padding(padding: EdgeInsets.zero),
-      body: Stack(
+      body: Column(
         children: [
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 20),
-                    child: Text(
-                      'Параметры сортировки:',
-                      style: TextStyle(fontSize: 15),
-                    ),
-                  ),
-                  Row(
-                    children: const [
-                      SizedBox(
-                        height: 100,
-                        width: 200,
-                        child: SortingParameterSelector(),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(left: 20),
+                      child: Text(
+                        'Параметры сортировки:',
+                        style: TextStyle(fontSize: 15),
                       ),
-                      SortingDirectionSelector(),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 60,
-                  ),
-                  const ShopsBrandsSelector(true),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  const ShopsBrandsSelector(false),
-                ],
+                    ),
+                    Row(
+                      children: const [
+                        SizedBox(
+                          height: 100,
+                          width: 200,
+                          child: SortingParameterSelector(),
+                        ),
+                        SortingDirectionSelector(),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 60,
+                    ),
+                    const ShopsBrandsSelector(true),
+                    const SizedBox(
+                      height: 40,
+                    ),
+                    const ShopsBrandsSelector(false),
+                  ],
+                ),
               ),
             ),
           ),

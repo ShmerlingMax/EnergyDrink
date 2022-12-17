@@ -16,8 +16,15 @@ class SortingParameterSelector extends StatelessWidget {
                 SortingParameter.price,
             child: ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('цена'),
+              title: const Text(
+                'цена',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               leading: Radio<SortingParameter>(
+                activeColor: Colors.black,
                 value: SortingParameter.price,
                 groupValue: context.watch<Settings>().sortingParameter,
                 onChanged: (SortingParameter? value) {
@@ -33,8 +40,15 @@ class SortingParameterSelector extends StatelessWidget {
                 SortingParameter.discount,
             child: ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('скидка'),
+              title: const Text(
+                'скидка',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               leading: Radio<SortingParameter>(
+                activeColor: Colors.black,
                 value: SortingParameter.discount,
                 groupValue: context.watch<Settings>().sortingParameter,
                 onChanged: (SortingParameter? value) {

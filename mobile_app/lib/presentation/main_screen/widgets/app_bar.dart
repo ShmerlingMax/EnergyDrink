@@ -37,9 +37,12 @@ class MainAppBar extends StatelessWidget with PreferredSizeWidget {
                     child: TextFormField(
                       controller: controller,
                       decoration: const InputDecoration(
-                        hintText: 'Поиск',
-                        border: InputBorder.none,
-                      ),
+                          hintText: 'Поиск',
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          )),
                       onEditingComplete: () {
                         context.read<Aggregation>().search = controller.text;
                         FocusManager.instance.primaryFocus?.unfocus();

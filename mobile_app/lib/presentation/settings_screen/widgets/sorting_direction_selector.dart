@@ -16,11 +16,23 @@ class SortingDirectionSelector extends StatelessWidget {
         items: const [
           DropdownMenuItem(
             value: SortingDirection.ascending,
-            child: Text('по возрастанию'),
+            child: Text(
+              'по возрастанию',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
           DropdownMenuItem(
             value: SortingDirection.descending,
-            child: Text('по убыванию'),
+            child: Text(
+              'по убыванию',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ],
         onChanged: (value) {

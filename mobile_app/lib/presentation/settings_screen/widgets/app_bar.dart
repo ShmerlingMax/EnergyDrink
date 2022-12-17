@@ -27,7 +27,10 @@ class SettingsAppBar extends StatelessWidget with PreferredSizeWidget {
           ),
           const Text(
             'Настройки',
-            style: TextStyle(fontSize: 20),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           Container(
             height: 50,
@@ -48,6 +51,7 @@ class SettingsAppBar extends StatelessWidget with PreferredSizeWidget {
                 style: TextStyle(
                   fontSize: 15,
                   color: Colors.black,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),

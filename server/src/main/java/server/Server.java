@@ -10,8 +10,8 @@ public class Server {
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException,
             TimeoutException {
-
-        int port = 8080;
-        new ServiceImpl().start().get(1, TimeUnit.SECONDS);
+        Service service = new ServiceImpl();
+        service.start().get(5, TimeUnit.SECONDS);
+        service.stop();
     }
 }

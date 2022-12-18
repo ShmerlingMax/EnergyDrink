@@ -11,7 +11,11 @@ public class Server {
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException,
             TimeoutException {
         Service service = new ServiceImpl();
-        service.start().get(5, TimeUnit.SECONDS);
-        service.stop();
+        try {
+            service.start().get(5, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            service.stop();
+            throw e;
+        }
     }
 }

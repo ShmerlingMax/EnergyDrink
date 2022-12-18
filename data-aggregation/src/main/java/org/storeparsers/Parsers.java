@@ -2,13 +2,23 @@ package org.storeparsers;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import net.coobird.thumbnailator.Thumbnails;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bson.Document;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -23,41 +33,79 @@ public class Parsers {
             "сильногазированныйированный", "негазированный", "л", "мл", "(энергетический)");
     private static final String defaultImageLink = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Question-mark-grey.jpg/1200px-Question-mark-grey.jpg";
 
+    private static final Log LOGGER = LogFactory.getLog(Parsers.class);
+
+    private static final int MONGODB_PORT = 27017;
+
     public static void main(String[] args) throws IOException, InterruptedException {
+        Locale.setDefault(new Locale("en", "RU"));
+        LOGGER.info("Locale: " + Locale.getDefault());
         JsonObject mainJson = new JsonObject();
         JsonArray shops = new JsonArray();
         JsonObject brandsObject = new JsonObject();
         JsonArray brandsArr = new JsonArray();
-        Set<String> brands = new HashSet<String>();
+        Set<String> brands = new HashSet<>();
 
+        LOGGER.info("Parse Lenta");
         shops.add(parseLenta(brands));
+
+        LOGGER.info("Parse Auchan");
         shops.add(parseAuchan(brands));
+
+        LOGGER.info("Parse Vkuster");
         shops.add(parseVkuster(brands));
+
+        LOGGER.info("Parse Perekresok");
         shops.add(parsePerekrestok(brands));
+
+        LOGGER.info("Parse Okey");
         shops.add(parseOkey(brands));
 
+        LOGGER.info("Build Brands");
         for (String brand : brands) {
             brandsArr.add(brand);
         }
 
+
         mainJson.add("shops", shops);
         brandsObject.add("brands", brandsArr);
 
-        PrintWriter writer = new PrintWriter("shops.json", "UTF-8");
+        PrintWriter writer = new PrintWriter("shops.json", StandardCharsets.UTF_8);
         writer.println(mainJson);
         writer.close();
 
-        writer = new PrintWriter("brands.json", "UTF-8");
+        writer = new PrintWriter("brands.json", StandardCharsets.UTF_8);
         writer.println(brandsObject);
         writer.close();
+
+        LOGGER.info("Put to mongodb");
+        String rootName = System.getenv(Config.MONGO_INITDB_ROOT_USERNAME);
+        String password = System.getenv(Config.MONGO_INITDB_ROOT_PASSWORD);
+        String databaseName = System.getenv(Config.MONGO_INITDB_DATABASE);
+        String host = System.getenv(Config.MONGO_HOSTNAME);
+
+        MongoCredential credential = MongoCredential.createCredential(rootName, databaseName, password.toCharArray());
+
+        ServerAddress serverAddress = new ServerAddress(host, MONGODB_PORT);
+        MongoClient mongoClient = new MongoClient(serverAddress, credential, MongoClientOptions.builder().build());
+        MongoDatabase database = mongoClient.getDatabase(databaseName);
+
+        long time =  System.currentTimeMillis();
+        MongoCollection<Document> brandsDocuments = database.getCollection("brands");
+        Document brandsDocument = new Document("id", time);
+        brandsDocument.append("json", brandsObject.toString());
+        brandsDocuments.insertOne(brandsDocument);
+
+        MongoCollection<Document> shopsDocuments = database.getCollection("shops");
+        Document shopsDocument = new Document("id", time);
+        shopsDocument.append("json", mainJson.toString());
+        shopsDocuments.insertOne(shopsDocument);
+        mongoClient.close();
 
     }
 
     private static JsonObject parseLenta(Set<String> brands) throws IOException, InterruptedException {
-        final String lentaIp = "https://82.202.190.33/";
         final String logoLink = "https://upload.wikimedia.org/wikipedia/commons/9/94/%D0%9B%D0%95%D0%9D%D0%A2%D0%90_%D0%BB%D0%BE%D0%B3%D0%BE.jpg";
-        final int pagesCount = 4;
-        final String productLinkKeyword = "<a href=\"/product/";
         final String fullNameKeyword = "<h1 class=\"sku-page__title\" itemprop=\"name\">        ";
         final String brandKeyword = "{&quot;key&quot;:&quot;Бренд&quot;,&quot;value&quot;:&quot;";
         final String imgKeyword = "<div class=\"sku-images-slider__image-block square__inner\">        <img          src=\"";
@@ -75,7 +123,7 @@ public class Parsers {
         responseAll += getHtmlCurl(commands);
 
         int productPosStart = 0;
-        List<String> energyDrinks = new ArrayList<String>();
+        List<String> energyDrinks = new ArrayList<>();
 
         while (productPosStart != -1) {
             int productLinkPosEnd = responseAll.indexOf("\n", productPosStart);
@@ -93,7 +141,7 @@ public class Parsers {
 
             commands = new String[]{"curl", "--cookie", cookie, energyDrink, "-k"};
             String response = getHtmlCurl(commands);
-
+            LOGGER.info(energyDrink);
             try {
                 int fullNamePosStart = response.indexOf(fullNameKeyword) + fullNameKeyword.length();
                 String fullName = response.substring(fullNamePosStart, response.indexOf(",", fullNamePosStart));
@@ -123,7 +171,7 @@ public class Parsers {
                         response.indexOf(",", newPricePosStart)));
 
                 int discountPosStart = response.indexOf(discountKeyword);
-                double discount = 0.0;
+                double discount;
                 if (discountPosStart == -1) {
                     discount = Math.abs((oldPrice - newPrice) / oldPrice);
                     DecimalFormat df = new DecimalFormat("#.00");
@@ -136,23 +184,12 @@ public class Parsers {
                     discount = (double) Integer.parseInt(discountStr) / 100;
                 }
 
-                eDrink.addProperty("fullName", removeWordsFromTitle(fullName));
-                eDrink.addProperty("brand", brand);
-                eDrink.addProperty("image", getCompressesImageBase64(new URL(imgLink)));
-                eDrink.addProperty("volume", volume);
-                eDrink.addProperty("priceWithDiscount", newPrice);
-                eDrink.addProperty("priceWithOutDiscount", oldPrice);
-                eDrink.addProperty("discount", discount);
-
-                eDrinks.add(eDrink);
+                makeEnergyDrinkJsonObject(eDrinks, eDrink, fullName, brand, imgLink, volume, oldPrice, newPrice, discount);
             } catch (StringIndexOutOfBoundsException c) {
                 PrintWriter writer = new PrintWriter("logLenta.txt", "UTF-8");
                 writer.println(response);
                 writer.close();
             }
-
-
-            Thread.sleep(3000);
         }
         shopLenta.addProperty("name", "ЛЕНТА");
         shopLenta.addProperty("image", getCompressesImageBase64(new URL(logoLink)));
@@ -160,10 +197,20 @@ public class Parsers {
         return shopLenta;
     }
 
+    private static void makeEnergyDrinkJsonObject(JsonArray eDrinks, JsonObject eDrink, String fullName, String brand, String imgLink, int volume, double oldPrice, double newPrice, double discount) throws IOException {
+        eDrink.addProperty("fullName", removeWordsFromTitle(fullName));
+        eDrink.addProperty("brand", brand);
+        eDrink.addProperty("image", getCompressesImageBase64(new URL(imgLink)));
+        eDrink.addProperty("volume", volume);
+        eDrink.addProperty("priceWithDiscount", newPrice);
+        eDrink.addProperty("priceWithOutDiscount", oldPrice);
+        eDrink.addProperty("discount", discount);
+
+        eDrinks.add(eDrink);
+    }
+
     private static JsonObject parseAuchan(Set<String> brands) throws IOException {
-        final String auchanBaseUrl = "https://www.auchan.ru";
         final String logoLink = "https://www.logobank.ru/images/ph/ru/a/logo-auchan.png";
-        final String productLinkKeyword = "class=\"linkToPDP active css-1kl2eos\" href=\"";
         final String fullNameKeyword = "<h1 id=\"productName\" class=\"css-pa63tw\">";
         final String brandKeyword = "<th class=\"css-12mfum8\">Бренд</th><td class=\"css-2619sg\">";
         final String imgClassKeyword = "class=\"picture css-11c870t\">";
@@ -201,61 +248,60 @@ public class Parsers {
 
             commands = new String[]{"curl", "--cookie", cookie, energyDrink};
             String drinkPage = getHtmlCurl(commands);
+            LOGGER.info(energyDrink);
 
-            int fullNamePosStart = drinkPage.indexOf(fullNameKeyword) + fullNameKeyword.length();
-            String fullName = drinkPage.substring(fullNamePosStart, drinkPage.indexOf(",", fullNamePosStart));
-            if (fullName.contains("</h1>")) {
-                fullName = fullName.substring(0, fullName.indexOf("</h1>") - 1);
-            }
+            try{
+                int fullNamePosStart = drinkPage.indexOf(fullNameKeyword) + fullNameKeyword.length();
+                String fullName = drinkPage.substring(fullNamePosStart, drinkPage.indexOf(",", fullNamePosStart));
+                if (fullName.contains("</h1>")) {
+                    fullName = fullName.substring(0, fullName.indexOf("</h1>") - 1);
+                }
 
-            int brandPosStart = drinkPage.indexOf(brandKeyword) + brandKeyword.length();
-            String brand = drinkPage.substring(brandPosStart, drinkPage.indexOf("</td>", brandPosStart));
-            brand = checkForRecurrentBrand(brand);
-            brands.add(brand);
+                int brandPosStart = drinkPage.indexOf(brandKeyword) + brandKeyword.length();
+                String brand = drinkPage.substring(brandPosStart, drinkPage.indexOf("</td>", brandPosStart));
+                brand = checkForRecurrentBrand(brand);
+                brands.add(brand);
 
-            int imgLinkPosStart = drinkPage.indexOf(imgLinkKeyword, drinkPage.indexOf(imgClassKeyword))
-                    + imgLinkKeyword.length();
-            String imgLink = drinkPage.substring(imgLinkPosStart, drinkPage.indexOf("\"", imgLinkPosStart));
-            imgLink = imgLink.substring(imgLink.indexOf("https"));
+                int imgLinkPosStart = drinkPage.indexOf(imgLinkKeyword, drinkPage.indexOf(imgClassKeyword))
+                        + imgLinkKeyword.length();
+                String imgLink = drinkPage.substring(imgLinkPosStart, drinkPage.indexOf("\"", imgLinkPosStart));
+                imgLink = imgLink.substring(imgLink.indexOf("https"));
 
-            int volumePosStart = drinkPage.indexOf(volumeKeyword) + volumeKeyword.length();
-            String volume = drinkPage.substring(volumePosStart, drinkPage.indexOf("</td>", volumePosStart));
-            int volumeInt = (int) (Double.parseDouble(volume) * 1000);
+                int volumePosStart = drinkPage.indexOf(volumeKeyword) + volumeKeyword.length();
+                String volume = drinkPage.substring(volumePosStart, drinkPage.indexOf("</td>", volumePosStart));
+                int volumeInt = (int) (Double.parseDouble(volume) * 1000);
 
-            int fullPricePosStart = drinkPage.indexOf(fullPriceKeyword) + fullPriceKeyword.length();
-            String fullPrice = drinkPage.substring(fullPricePosStart, drinkPage.indexOf(" ", fullPricePosStart));
-            double fullPricef = Double.parseDouble(fullPrice);
+                int fullPricePosStart = drinkPage.indexOf(fullPriceKeyword) + fullPriceKeyword.length();
+                String fullPrice = drinkPage.substring(fullPricePosStart, drinkPage.indexOf(" ", fullPricePosStart));
+                double fullPricef = Double.parseDouble(fullPrice);
 
 
-            int oldPricePosStart = drinkPage.indexOf(oldPriceKeyword);
-            double oldPricef = 0;
-            double newPricef = 0;
-            if (oldPricePosStart != -1) {
-                oldPricePosStart += oldPriceKeyword.length();
-                String oldPrice = drinkPage.substring(oldPricePosStart, drinkPage.indexOf(" ", oldPricePosStart));
-                oldPricef = Double.parseDouble(oldPrice);
+                int oldPricePosStart = drinkPage.indexOf(oldPriceKeyword);
+                double oldPricef;
+                double newPricef;
+                if (oldPricePosStart != -1) {
+                    oldPricePosStart += oldPriceKeyword.length();
+                    String oldPrice = drinkPage.substring(oldPricePosStart, drinkPage.indexOf(" ", oldPricePosStart));
+                    oldPricef = Double.parseDouble(oldPrice);
+                } else {
+                    oldPricef = fullPricef;
+                }
                 newPricef = fullPricef;
-            } else {
-                oldPricef = fullPricef;
-                newPricef = fullPricef;
-            }
-            double discountf = 0.0;
-            if (oldPricePosStart != -1) {
-                int discountPosStart = drinkPage.indexOf(discountKeyword) + discountKeyword.length();
-                String discount = drinkPage.substring(discountPosStart, drinkPage.indexOf("<!-- -->", discountPosStart));
-                discountf = Integer.parseInt(discount);
-                discountf /= 100;
+                double discountf = 0.0;
+                if (oldPricePosStart != -1) {
+                    int discountPosStart = drinkPage.indexOf(discountKeyword) + discountKeyword.length();
+                    String discount = drinkPage.substring(discountPosStart, drinkPage.indexOf("<!-- -->", discountPosStart));
+                    discountf = Integer.parseInt(discount);
+                    discountf /= 100;
+                }
+
+                makeEnergyDrinkJsonObject(eDrinks, eDrink, fullName, brand, imgLink, volumeInt, oldPricef, newPricef, discountf);
+            }catch (StringIndexOutOfBoundsException c) {
+                PrintWriter writer = new PrintWriter("logAuchan.txt", "UTF-8");
+                writer.println(drinkPage);
+                writer.close();
             }
 
-            eDrink.addProperty("fullName", removeWordsFromTitle(fullName));
-            eDrink.addProperty("brand", brand);
-            eDrink.addProperty("image", getCompressesImageBase64(new URL(imgLink)));
-            eDrink.addProperty("volume", volumeInt);
-            eDrink.addProperty("priceWithDiscount", newPricef);
-            eDrink.addProperty("priceWithOutDiscount", oldPricef);
-            eDrink.addProperty("discount", discountf);
-
-            eDrinks.add(eDrink);
         }
         shopAuchan.addProperty("name", "АШАН");
         shopAuchan.addProperty("image", getCompressesImageBase64(new URL(logoLink)));
@@ -268,7 +314,7 @@ public class Parsers {
         String baseUrl = "https://vkuster.ru";
         String url = "https://vkuster.ru/catalog/bezalkogolnye-napitki/energeticheskie-napitki/";
         String logoLink = "https://yoplace.ru/media/chain/vkuster.jpg";
-        HashMap<String, String> drinksNames = new HashMap<String, String>();
+        HashMap<String, String> drinksNames = new HashMap<>();
         drinksNames.put("Gorilla", "Горилла");
         drinksNames.put("Adrenaline", "Адреналин");
         boolean isDiscounted = true;
@@ -290,7 +336,7 @@ public class Parsers {
 
             String oldPrice = oldPriceClass.text();
             oldPrice = oldPrice.substring(0, oldPrice.length() - 1);
-            String newPrice = "";
+            String newPrice;
             if (isDiscounted) {
                 newPrice = energyDrink.select("span[class=\"product__price promo\"]").text();
                 newPrice = newPrice.replaceAll("\\s+", "");
@@ -360,14 +406,13 @@ public class Parsers {
         final String brandKeyword = "id=\"descAttributeValue_1_6_3074457345618260154_3074457345618267449\"> ";
         final String imgKeyword = "\"productMainImage\" src=\"";
         final String titleKeyword = "\"main_header\" itemprop=\"name\">";
-        final String productPriceKeyword = "class=\"product-price\"";
         boolean isDiscounted = true;
 
         String[] commands = new String[]{"curl", "-H", "Host: www.okeydostavka.ru", "https://178.218.214.178/spb/goriachie-i-kholodnye-napitki/energeticheskie-napitki#facet:&productBeginIndex:0&orderBy:2&pageView:grid&minPrice:1&maxPrice:300&pageSize:1000&", "-k"};
         String responseAll = getHtmlCurl(commands);
 
 
-        List<String> energyDrinks = new ArrayList<String>();
+        List<String> energyDrinks = new ArrayList<>();
         int productPosStart = responseAll.indexOf(productKeyword);
         while (productPosStart != -1) {
             int productLinkPosStart = responseAll.indexOf(productLinkKeyword, productPosStart);
@@ -386,16 +431,15 @@ public class Parsers {
         JsonArray eDrinks = new JsonArray();
 
 
-        String result = "";
         for (String energyDrink : energyDrinks) {
 
             JsonObject eDrink = new JsonObject();
             commands = new String[]{"curl", "-H", "Host: www.okeydostavka.ru", energyDrink, "-k"};
             String response = getHtmlCurl(commands);
-
+            LOGGER.info(energyDrink);
             try {
                 int priceWithoutDiscountPosStart = response.indexOf(priceWithoutDiscountKeyword);
-                String priceWithoutDiscount = "";
+                String priceWithoutDiscount;
                 if (priceWithoutDiscountPosStart != -1) {
                     priceWithoutDiscount = response.substring(priceWithoutDiscountPosStart + priceWithoutDiscountKeyword.length(),
                             response.indexOf("</span>", priceWithoutDiscountPosStart) - 2);
@@ -410,7 +454,7 @@ public class Parsers {
                 priceWithoutDiscount = priceWithoutDiscount.substring(0, priceWithoutDiscount.length() - 1);
 
                 int priceWithDiscountPosStart = response.indexOf(priceWithDiscountKeyword);
-                String priceWithDiscount = "";
+                String priceWithDiscount;
                 if (isDiscounted) {
                     priceWithDiscount = response.substring(priceWithDiscountPosStart + priceWithDiscountKeyword.length(),
                             response.indexOf("</span>", priceWithDiscountPosStart) - 2);
@@ -421,7 +465,7 @@ public class Parsers {
                     priceWithDiscount = priceWithoutDiscount;
                 }
 
-                String discount = "";
+                String discount;
                 int discountPosStart = response.indexOf(discountKeyword);
                 if (isDiscounted) {
                     discount = response.substring(discountPosStart + discountKeyword.length(),
@@ -436,7 +480,6 @@ public class Parsers {
                         response.indexOf("</div>", volumePosStart));
                 volume = volume.replaceAll("\\s+", "");
                 volume = volume.replace(",", ".");
-                System.out.println(volume);
 
                 int brandPosStart = response.indexOf(brandKeyword);
                 String brand = response.substring(brandPosStart + brandKeyword.length(),
@@ -481,11 +524,11 @@ public class Parsers {
                 eDrink.addProperty("priceWithDiscount", Double.parseDouble(priceWithDiscount));
                 eDrink.addProperty("priceWithOutDiscount", Double.parseDouble(priceWithoutDiscount));
                 eDrink.addProperty("discount", Math.abs(Double.parseDouble(discount)) / 100);
-                System.out.println(energyDrink);
                 eDrinks.add(eDrink);
                 isDiscounted = true;
 
             } catch (StringIndexOutOfBoundsException c) {
+                LOGGER.warn("Okey", c.fillInStackTrace());
                 PrintWriter writer = new PrintWriter("logOkey.txt", "UTF-8");
                 writer.println(response);
                 writer.close();
@@ -539,7 +582,7 @@ public class Parsers {
             JsonObject eDrink = new JsonObject();
             commands = new String[]{"curl", energyDrink};
             String response = getHtmlCurl(commands);
-
+            LOGGER.info(energyDrink);
             if (response.contains("Этот товар закончился")) {
                 continue;
             }
@@ -582,7 +625,7 @@ public class Parsers {
                         response.indexOf("\"", imgLinkPosStart + imgKeyword.length()));
 
                 String span = "<span>";
-                String discount = "";
+                String discount;
                 int discountPosStart = response.indexOf(discountKeyword);
                 if (discountPosStart != -1) {
                     int discountPosStart1 = response.indexOf(span, discountPosStart);
@@ -601,7 +644,7 @@ public class Parsers {
                         response.indexOf("</div>", response.indexOf(newPriceKeyword, pricePosStart)) - 2);
                 newPrice = newPrice.replace(',', '.');
 
-                String oldPrice = "";
+                String oldPrice;
                 if (isDiscounted) {
                     oldPrice = response.substring(response.indexOf(oldPriceKeyword, pricePosStart) + oldPriceKeyword.length(),
                             response.indexOf("</div>", response.indexOf(oldPriceKeyword, pricePosStart)) - 2);
@@ -638,7 +681,7 @@ public class Parsers {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buf = new byte[1024];
-        int n = 0;
+        int n;
         while (-1 != (n = in.read(buf))) {
             out.write(buf, 0, n);
         }
@@ -668,7 +711,7 @@ public class Parsers {
                 .map(String::trim)
                 .collect(Collectors.toList());
         List<String> wordsLowerCase = stringsToLowerCase(words);
-        String word = "";
+        String word;
         for (int i = 0; i < wordsLowerCase.size(); i++) {
             word = wordsLowerCase.get(i);
             if (Parsers.deleteFromTitle.contains(word) || isNumeric(word)) {
@@ -703,33 +746,39 @@ public class Parsers {
         BufferedReader reader = new BufferedReader(new
                 InputStreamReader(process.getInputStream()));
         String line;
-        String response = "";
+        StringBuilder response = new StringBuilder();
         while ((line = reader.readLine()) != null) {
-            response += (line);
+            response.append(line);
         }
         reader.close();
         for (String command : commands) {
             if (command.contains("lenta") && !command.contains("main")) {
-                File file = new File("src/main/resources/lentadrinks.txt");
-                FileReader reader1 = new FileReader(file);
-                BufferedReader bufferedReader = new BufferedReader(reader1);
-                response = "";
-                while ((line = bufferedReader.readLine()) != null) {
-                    response += line + "\n";
+                try(BufferedReader br = new BufferedReader(new InputStreamReader(Parsers.class.getClassLoader().getResourceAsStream("lentadrinks.txt")))) {
+                    response = new StringBuilder();
+                    while ((line = br.readLine()) != null) {
+                        response.append(line).append("\n");
+                    }
                 }
 
-            } else if (command.contains("auchan") && !command.contains("main")) {
-                File file = new File("src/main/resources/auchandrinks.txt");
+                /*File file = new File("src/main/resources/lentadrinks.txt");
                 FileReader reader1 = new FileReader(file);
                 BufferedReader bufferedReader = new BufferedReader(reader1);
-                response = "";
+                response = new StringBuilder();
                 while ((line = bufferedReader.readLine()) != null) {
-                    response += line + "\n";
+                    response.append(line).append("\n");
+                }*/
+
+            } else if (command.contains("auchan") && !command.contains("main")) {
+                try(BufferedReader br = new BufferedReader(new InputStreamReader(Parsers.class.getClassLoader().getResourceAsStream("auchandrinks.txt")))) {
+                    response = new StringBuilder();
+                    while ((line = br.readLine()) != null) {
+                        response.append(line).append("\n");
+                    }
                 }
             }
         }
 
-        return response;
+        return response.toString();
     }
 
     public static String checkForRecurrentBrand(String brand) {
@@ -765,5 +814,12 @@ public class Parsers {
             return "OZВЕРИН";
         }
         return brand;
+    }
+
+    static class Config {
+        private static final String MONGO_INITDB_ROOT_USERNAME = "MONGO_INITDB_ROOT_USERNAME";
+        private static final String MONGO_INITDB_ROOT_PASSWORD = "MONGO_INITDB_ROOT_PASSWORD";
+        private static final String MONGO_INITDB_DATABASE = "MONGO_INITDB_DATABASE";
+        private static final String MONGO_HOSTNAME = "MONGO_HOSTNAME";
     }
 }

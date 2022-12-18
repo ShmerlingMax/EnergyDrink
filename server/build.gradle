@@ -1,7 +1,6 @@
 plugins {
     id 'java'
     id 'application'
-    id 'net.ltgt.errorprone' version '2.0.2'
     id 'checkstyle'
     id "com.github.johnrengelman.shadow" version "7.1.2"
 }
@@ -20,7 +19,8 @@ version '1.0-SNAPSHOT'
 
 
 dependencies {
-    errorprone 'com.google.errorprone:error_prone_core:2.15.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     checkstyle 'com.puppycrawl.tools:checkstyle:10.3.3'
     implementation 'org.slf4j:slf4j-api:2.0.0'
     implementation 'ch.qos.logback:logback-classic:1.4.0'
@@ -30,8 +30,15 @@ dependencies {
     implementation group: 'org.mongodb', name: 'mongo-java-driver', version: '3.12.11'
 }
 
+def incubatorArgs = ["--add-modules", "jdk.incubator.foreign"]
+
 application {
     mainClass = 'server.Server'
+}
+
+test {
+    maxHeapSize = "128m"
+    useJUnitPlatform()
 }
 
 configurations {
@@ -40,7 +47,6 @@ configurations {
 
 run {
     application
-    applicationDefaultJvmArgs = ['-Xmx1024m']
 }
 
 jar {
@@ -62,4 +68,12 @@ shadowJar {
 checkstyle {
     configFile = new File("checkstyle.xml")
     checkstyleTest.enabled = true
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += incubatorArgs
+}
+
+tasks.withType(Test) {
+    jvmArgs += incubatorArgs
 }

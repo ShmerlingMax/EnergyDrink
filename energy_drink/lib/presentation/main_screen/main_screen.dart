@@ -24,8 +24,8 @@ class _MainScreenState extends State<MainScreen> {
   late Future<List<String>> brands;
   @override
   void initState() {
-    shops = Api().getMockShops();
-    brands = Api().getMockBrands();
+    shops = Api().getShops();
+    brands = Api().getBrands();
     _showError(context, brands);
     _showWarning(context, brands);
     super.initState();

@@ -6,7 +6,7 @@ import 'package:energy_drink/domain/models/shop_model/shop_model.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 class ApiConfig {
-  static const baseUrl = "";
+  static const baseUrl = "http://84.201.139.105:8080";
   static const brands = "/brands";
   static const shops = "/shops";
 }
@@ -102,21 +102,6 @@ class Api {
     if (json.isEmpty) {
       return [];
     }
-    final brands =
-        (json['brands'] as List<dynamic>).map((e) => e as String).toList();
-    return brands;
-  }
-
-  Future<List<Shop>> getMockShops() async {
-    final json = jsonDecode(await rootBundle.loadString('assets/shops.json'));
-    final shops = (json['shops'] as List<dynamic>)
-        .map((e) => Shop.fromJson(e as Map<String, dynamic>))
-        .toList();
-    return shops;
-  }
-
-  Future<List<String>> getMockBrands() async {
-    final json = jsonDecode(await rootBundle.loadString('assets/brands.json'));
     final brands =
         (json['brands'] as List<dynamic>).map((e) => e as String).toList();
     return brands;

@@ -1,12 +1,19 @@
 version: "3.8"
 services:
+  server:
+    image: nikita17th/server:latest
+    ports:
+      - "8080:8080"
+    networks:
+      vpcbr:
+        ipv4_address: 173.18.0.2
   mongodb:
     image: mongo
     container_name: mongodb
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=pass12345
-      - MONGO_INITDB_DATABASE=energy-drinks
+      - MONGO_INITDB_DATABASE=energy_drinks
     volumes:
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
       - ./mongodb:/data/db
@@ -18,11 +25,17 @@ services:
       timeout: 10s
       retries: 3
     restart: unless-stopped
-  server:
-    image: server
-    ports:
-      - "8080:8080"
-
+    networks:
+      vpcbr:
+        ipv4_address: 173.18.0.3
 
 volumes:
   mongodb:
+
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 173.18.0.0/16
+          gateway: 173.18.0.1

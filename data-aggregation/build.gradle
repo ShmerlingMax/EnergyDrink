@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 group 'org.example'
@@ -16,4 +17,10 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+shadowJar {
+    archiveBaseName.set("data-aggregation")
+    archiveClassifier.set('shadow')
+    archiveVersion.set('0.0.1')
 }

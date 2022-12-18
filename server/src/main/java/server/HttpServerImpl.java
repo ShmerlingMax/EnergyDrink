@@ -1,9 +1,5 @@
 package server;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import one.nio.http.HttpServer;
@@ -29,7 +25,6 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static com.mongodb.client.model.Sorts.ascending;
 import static com.mongodb.client.model.Sorts.descending;
 import static one.nio.http.Request.METHOD_DELETE;
 import static one.nio.http.Request.METHOD_GET;
@@ -99,13 +94,11 @@ public class HttpServerImpl extends HttpServer {
         poolExecutor.execute(() -> {
             try {
                 String path = request.getPath();
-                System.out.println(path);
                 if (!path.equals(PATH_BRANDS) && !path.equals(PATH_SHOPS)) {
                     session.sendResponse(BAD_RESPONSE);
                     return;
                 }
                 int methodName = request.getMethod();
-                System.out.println(methodName);
                 if (!SUPPORTED_METHODS.contains(methodName)) {
                     session.sendResponse(METHOD_NOT_ALLOWED);
                     return;
@@ -141,11 +134,7 @@ public class HttpServerImpl extends HttpServer {
     }
 
     private void handleGetBrands(@Nonnull Request request, HttpSession session) throws IOException {
-        System.out.println("here");
-
         MongoCollection<Document> brands = database.getCollection(CollectionsMongoDb.BRANDS.name);
-        System.out.println(brands.find().first());
-
         handleGetFromMongo(session, brands);
     }
 
@@ -155,14 +144,12 @@ public class HttpServerImpl extends HttpServer {
                 .limit(1)
                 .first();
 
-        System.out.println(doc);
         if (doc == null || doc.isEmpty()) {
             session.sendResponse(new Response(Response.NOT_FOUND, Response.EMPTY));
             return;
         }
 
         String brandJson = doc.getString("json");
-        System.out.println(brandJson);
         session.sendResponse(new Response(Response.OK, brandJson.getBytes(StandardCharsets.UTF_8)));
     }
 
@@ -171,6 +158,7 @@ public class HttpServerImpl extends HttpServer {
         SHOPS("shops");
 
         final String name;
+
         CollectionsMongoDb(String name) {
             this.name = name;
         }

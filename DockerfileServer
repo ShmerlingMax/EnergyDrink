@@ -1,3 +1,0 @@
-FROM openjdk:17-oracle
-COPY ./server/build/libs/shadow.jar .
-CMD ["java", "-jar", "shadow.jar"]

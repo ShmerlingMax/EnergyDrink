@@ -1,7 +1,13 @@
 version: "3.8"
+
 services:
   server:
     image: nikita17th/server:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=pass12345
+      - MONGO_INITDB_DATABASE=energy_drinks
+      - MONGO_HOSTNAME=173.18.0.3
     ports:
       - "8080:8080"
     networks:
@@ -10,6 +16,8 @@ services:
   mongodb:
     image: mongo
     container_name: mongodb
+    env_file:
+      - env-variables.env
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=pass12345
@@ -29,6 +37,19 @@ services:
       vpcbr:
         ipv4_address: 173.18.0.3
 
+  data-aggregation:
+    image: nikita17th/data-aggregation:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=pass12345
+      - MONGO_INITDB_DATABASE=energy_drinks
+      - MONGO_HOSTNAME=173.18.0.3
+    ports:
+      - "8081:8081"
+    networks:
+      vpcbr:
+        ipv4_address: 173.18.0.4
+
 volumes:
   mongodb:
 
@@ -39,3 +60,5 @@ networks:
       config:
         - subnet: 173.18.0.0/16
           gateway: 173.18.0.1
+
+

@@ -1,27 +1,57 @@
 plugins {
     id 'java'
+    id 'application'
     id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 repositories {
     mavenCentral()
 }
 
+group 'org.example'
+version '1.0-SNAPSHOT'
+
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    implementation 'commons-logging:commons-logging:1.2'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.10'
     implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.17'
     implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.3'
+    implementation group: 'org.mongodb', name: 'mongo-java-driver', version: '3.12.11'
+}
+
+application {
+    mainClass = 'org.storeparsers.Scheduler'
+}
+
+configurations {
+    extraLibs
 }
 
 test {
+    maxHeapSize = "128m"
     useJUnitPlatform()
 }
+
+run {
+    application
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "org.storeparsers.Scheduler"
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
 
 shadowJar {
     archiveBaseName.set("data-aggregation")

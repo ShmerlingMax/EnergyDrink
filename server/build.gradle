@@ -19,8 +19,6 @@ version '1.0-SNAPSHOT'
 
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     checkstyle 'com.puppycrawl.tools:checkstyle:10.3.3'
     implementation 'org.slf4j:slf4j-api:2.0.0'
     implementation 'ch.qos.logback:logback-classic:1.4.0'
@@ -68,12 +66,4 @@ shadowJar {
 checkstyle {
     configFile = new File("checkstyle.xml")
     checkstyleTest.enabled = true
-}
-
-tasks.withType(JavaCompile) {
-    options.compilerArgs += incubatorArgs
-}
-
-tasks.withType(Test) {
-    jvmArgs += incubatorArgs
 }

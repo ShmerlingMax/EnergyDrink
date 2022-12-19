@@ -15,13 +15,14 @@ import org.bson.Document;
 import java.io.*;
 import java.util.*;
 
-public class StoresParser {
+public class StoresParser extends TimerTask {
 
     public static final Log LOGGER = LogFactory.getLog(StoresParser.class);
 
     private static final int MONGODB_PORT = 27017;
 
-    public static void main(String[] args) throws IOException {
+    @Override
+    public void run() {
         Locale.setDefault(new Locale("en", "RU"));
         LOGGER.info("Locale: " + Locale.getDefault());
 
@@ -38,20 +39,26 @@ public class StoresParser {
         ParserVkuster parserVkuster = new ParserVkuster();
         ParserOkey parserOkey = new ParserOkey();
 
-        LOGGER.info("Parsing Lenta");
-        shopsArray.add(parserLenta.parseStore(brands));
+        try {
+//            LOGGER.info("Parsing Lenta");
+//            shopsArray.add(parserLenta.parseStore(brands));
+//
+//            LOGGER.info("Parsing Auchan");
+//            shopsArray.add(parserAuchan.parseStore(brands));
 
-        LOGGER.info("Parsing Auchan");
-        shopsArray.add(parserAuchan.parseStore(brands));
+            LOGGER.info("Parsing Vkuster");
+            shopsArray.add(parserVkuster.parseStore(brands));
 
-        LOGGER.info("Parsing Vkuster");
-        shopsArray.add(parserVkuster.parseStore(brands));
+//            LOGGER.info("Parsing Perekresok");
+//            shopsArray.add(parserPerekrestok.parseStore(brands));
+//
+//            LOGGER.info("Parsing Okey");
+            //shopsArray.add(parserOkey.parseStore(brands));
+        } catch (IOException e) {
+            LOGGER.error("IOException In StoresParser", e);
+            throw new RuntimeException(e);
+        }
 
-        LOGGER.info("Parsing Perekresok");
-        shopsArray.add(parserPerekrestok.parseStore(brands));
-
-        LOGGER.info("Parsing Okey");
-        shopsArray.add(parserOkey.parseStore(brands));
 
         LOGGER.info("Building Brands Array");
         for (String brand : brands) {

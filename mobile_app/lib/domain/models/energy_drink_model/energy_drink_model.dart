@@ -32,6 +32,10 @@ class EnergyDrink {
   Map<String, dynamic> toJson() => _$EnergyDrinkToJson(this);
 }
 
-Image _convertStringToImage(String json) => Image.memory(base64Decode(json));
+Image _convertStringToImage(String json) => Image.memory(
+      base64Decode(json),
+      width: 50,
+      height: 30,
+    );
 
 String _convertImageToString(Image image) => image.toString();

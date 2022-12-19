@@ -149,9 +149,6 @@ public class ParserOkey extends Parser{
 
             } catch (StringIndexOutOfBoundsException c) {
                 StoresParser.LOGGER.warn("Okey", c.fillInStackTrace());
-                PrintWriter writer = new PrintWriter("logOkey.txt", "UTF-8");
-                writer.println(response);
-                writer.close();
             }
         }
 

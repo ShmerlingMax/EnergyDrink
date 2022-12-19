@@ -95,9 +95,7 @@ public class ParserLenta extends Parser {
 
                 makeEnergyDrinkJsonObject(eDrinks, eDrink, fullName, brand, imgLink, volume, oldPrice, newPrice, discount);
             } catch (StringIndexOutOfBoundsException | IOException c) {
-                PrintWriter writer = new PrintWriter("logLenta.txt", "UTF-8");
-                writer.println(response);
-                writer.close();
+                StoresParser.LOGGER.warn("Lenta", c.fillInStackTrace());
             }
         }
         shopLenta.addProperty("name", "ЛЕНТА");

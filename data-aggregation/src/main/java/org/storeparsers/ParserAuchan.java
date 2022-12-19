@@ -99,9 +99,7 @@ public class ParserAuchan extends Parser{
 
                 makeEnergyDrinkJsonObject(eDrinks, eDrink, fullName, brand, imgLink, volumeInt, oldPricef, newPricef, discountf);
             }catch (StringIndexOutOfBoundsException c) {
-                PrintWriter writer = new PrintWriter("logAuchan.txt", "UTF-8");
-                writer.println(drinkPage);
-                writer.close();
+                StoresParser.LOGGER.warn("Auchan", c.fillInStackTrace());
             }
 
         }

@@ -134,9 +134,7 @@ public class ParserPerekrestok extends Parser{
                 eDrinks.add(eDrink);
                 isDiscounted = true;
             } catch (StringIndexOutOfBoundsException c) {
-                PrintWriter writer = new PrintWriter("logPerekrestok.txt", "UTF-8");
-                writer.println(response);
-                writer.close();
+                StoresParser.LOGGER.warn("Perekrestok", c.fillInStackTrace());
             }
         }
         shopPerekrestok.addProperty("name", "ПЕРЕКРЕСТОК");

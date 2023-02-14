@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:energy_drink/data/services/shared_pref_service.dart';
 import 'package:energy_drink/domain/models/shop_model/shop_model.dart';
 import 'package:flutter/services.dart' show rootBundle;
+
+import 'mock_dio_adapter.dart';
 
 class ApiConfig {
   static const baseUrl = "http://84.201.139.105:8080";
@@ -29,6 +32,9 @@ class Api {
 
   Dio get client {
     final dio = Dio(_baseOptions);
+    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+      dio.httpClientAdapter = MockDioAdapter();
+    }
     return dio;
   }
 

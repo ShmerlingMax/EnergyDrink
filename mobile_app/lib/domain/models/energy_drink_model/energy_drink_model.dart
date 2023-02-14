@@ -1,12 +1,13 @@
 import 'dart:convert';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'energy_drink_model.g.dart';
 
 @JsonSerializable()
-class EnergyDrink {
+class EnergyDrink extends Equatable {
   EnergyDrink(
     this.fullName,
     this.brand,
@@ -25,6 +26,16 @@ class EnergyDrink {
   double priceWithOutDiscount;
   double discount;
   int volume;
+
+  @override
+  List<Object> get props => [
+        fullName,
+        brand,
+        priceWithDiscount,
+        priceWithOutDiscount,
+        discount,
+        volume,
+      ];
 
   factory EnergyDrink.fromJson(Map<String, dynamic> json) =>
       _$EnergyDrinkFromJson(json);

@@ -1,25 +1,25 @@
 {
-	// Используйте IntelliSense, чтобы узнать о возможных атрибутах.
-	// Наведите указатель мыши, чтобы просмотреть описания существующих атрибутов.
-	// Для получения дополнительной информации посетите: https://go.microsoft.com/fwlink/?linkid=830387
 	"version": "0.2.0",
 	"configurations": [
 		{
 			"name": "energy_drink",
 			"request": "launch",
-			"type": "dart"
+			"type": "dart",
+			"preLaunchTask": "UnitTest"
 		},
 		{
 			"name": "energy_drink (profile mode)",
 			"request": "launch",
 			"type": "dart",
-			"flutterMode": "profile"
+			"flutterMode": "profile",
+			"preLaunchTask": "UnitTest"
 		},
 		{
 			"name": "energy_drink (release mode)",
 			"request": "launch",
 			"type": "dart",
-			"flutterMode": "release"
+			"flutterMode": "release",
+			"preLaunchTask": "UnitTest"
 		}
 	]
 }

@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:energy_drink/domain/models/aggregation_model/aggregation_model.dart';
 import 'package:energy_drink/domain/models/energy_drink_model/energy_drink_model.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../mock_data.dart';

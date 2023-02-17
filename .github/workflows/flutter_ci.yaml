@@ -21,5 +21,6 @@ jobs:
         run: lcov --remove coverage/lcov.info 'lib/*/*.freezed.dart' 'lib/*/*.g.dart' -o coverage/lcov.info
       - uses: codecov/codecov-action@v1.2.1
         with:
+          working-directory: ./mobile_app
           file: coverage/lcov.info
           token: "${( secrets.CODECOV_TOKEN )}"

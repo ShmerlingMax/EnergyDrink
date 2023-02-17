@@ -111,14 +111,14 @@ void main() {
         aggregation.init(mockShopsNames, mockBrandsNames);
       });
 
-      test('default parameters: discount and descending', () {
+      test('discount and descending', () {
         List<EnergyDrink> expected = [energyDrink1, energyDrink2, energyDrink3];
         final result =
             aggregation.sort(getMockShops()).map((e) => e.key).toList();
         expect(result, equals(expected));
       });
 
-      test('non-default parameters: discount and ascending', () {
+      test('discount and ascending', () {
         aggregation.sortingDirection = SortingDirection.ascending;
         List<EnergyDrink> expected = [energyDrink3, energyDrink2, energyDrink1];
         final result =
@@ -126,7 +126,7 @@ void main() {
         expect(result, equals(expected));
       });
 
-      test('non-default parameters: price and descending', () {
+      test('price and descending', () {
         aggregation.sortingParameter = SortingParameter.price;
         List<EnergyDrink> expected = [energyDrink3, energyDrink2, energyDrink1];
         final result =
@@ -134,7 +134,7 @@ void main() {
         expect(result, equals(expected));
       });
 
-      test('non-default parameters: price and ascending', () {
+      test('price and ascending', () {
         aggregation.sortingParameter = SortingParameter.price;
         aggregation.sortingDirection = SortingDirection.ascending;
         List<EnergyDrink> expected = [energyDrink1, energyDrink2, energyDrink3];

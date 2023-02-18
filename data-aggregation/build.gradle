@@ -23,6 +23,7 @@ dependencies {
     implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.3'
     implementation group: 'org.mongodb', name: 'mongo-java-driver', version: '3.12.11'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
 }
 
 application {

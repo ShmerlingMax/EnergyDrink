@@ -8,6 +8,7 @@ public class Scheduler {
     public static void main(String[] args) {
         Timer timer = new Timer();
         StoresParser task = new StoresParser();
+        task.run();
         timer.scheduleAtFixedRate(task, 0, SIX_HOURS);
     }
 }

@@ -40,20 +40,25 @@ public class StoresParser extends TimerTask {
         ParserOkey parserOkey = new ParserOkey();
 
         try {
-            LOGGER.info("Parsing Lenta");
-            shopsArray.add(parserLenta.parseStore(brands));
-
-            LOGGER.info("Parsing Auchan");
-            shopsArray.add(parserAuchan.parseStore(brands));
-
             LOGGER.info("Parsing Vkuster");
-            shopsArray.add(parserVkuster.parseStore(brands));
-
-            LOGGER.info("Parsing Perekresok");
-            shopsArray.add(parserPerekrestok.parseStore(brands));
+            shopsArray.add(parserVkuster.parseStore());
+            brands.addAll(parserVkuster.brands);
 
             LOGGER.info("Parsing Okey");
-            shopsArray.add(parserOkey.parseStore(brands));
+            shopsArray.add(parserOkey.parseStore());
+            brands.addAll(parserOkey.brands);
+
+            LOGGER.info("Parsing Auchan");
+            shopsArray.add(parserAuchan.parseStore());
+            brands.addAll(parserAuchan.brands);
+
+            LOGGER.info("Parsing Lenta");
+            shopsArray.add(parserLenta.parseStore());
+            brands.addAll(parserLenta.brands);
+
+            LOGGER.info("Parsing Perekresok");
+            shopsArray.add(parserPerekrestok.parseStore());
+            brands.addAll(parserPerekrestok.brands);
         } catch (IOException e) {
             LOGGER.error("IOException In StoresParser", e);
             throw new RuntimeException(e);

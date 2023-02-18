@@ -1,0 +1,11 @@
+<a href="/product/napitok-energeticheskiy-silnogaz-gorilla-0-45l-zh-b/" class="product">
+ <div class="product__cover" style="background-image: url('/static/content/products/746/photos/main_catalog.jpg')"></div>
+ <div class="product__hint grey">
+  95.90<small>₽</small>
+ </div>
+ <div class="col text-end"></div>
+ <div class="product__caption"><span class="product__price promo">79.90&nbsp;<small>₽</small></span>
+ </div>
+ <div class="product__description">
+  Напиток энергетический сильногаз Горилла 0.45л ж/б
+ </div> </a>

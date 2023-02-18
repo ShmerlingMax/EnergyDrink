@@ -6,11 +6,9 @@ import com.mongodb.client.MongoDatabase;
 import one.nio.http.HttpClient;
 import one.nio.http.HttpException;
 import one.nio.http.HttpServer;
-import one.nio.http.HttpServerConfig;
 import one.nio.http.Response;
 import one.nio.net.ConnectionString;
 import one.nio.pool.PoolException;
-import one.nio.server.AcceptorConfig;
 import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -95,39 +93,42 @@ class HttpServerImplTest {
 
     @Test
     void handleGetShopsMethodWhenEmptyDb() throws HttpException, IOException, PoolException, InterruptedException {
-        when(database.getCollection(HttpServerImpl.CollectionsMongoDb.SHOPS.name)).thenReturn(collection);
-        when(collection.find()).thenReturn(iterable);
-        when(iterable.sort(descending("id"))).thenReturn(iterable);
-        when(iterable.limit(1)).thenReturn(iterable);
-        when(iterable.first()).thenReturn(null);
+        mockWorkWithMongo(HttpServerImpl.CollectionsMongoDb.SHOPS, null);
         Response response = client.get("/shops");
         assertEquals(0, response.getBody().length, "Get shops method if not find doc, response should contains empty body");
         assertEquals(response.getStatus(), 404, "Get shops method if not find doc, response should has status 404 Not Found!");
     }
 
     @Test
+    void handleGetBrandsMethodWhenEmptyDocument() throws HttpException, IOException, PoolException, InterruptedException {
+        mockWorkWithMongo(HttpServerImpl.CollectionsMongoDb.BRANDS, new Document());
+        Response response = client.get("/brands");
+        assertEquals(0, response.getBody().length, "Get brands method if doc empty, response should contains empty body");
+        assertEquals(response.getStatus(), 404, "Get brands method if doc empty, response should has status 404 Not Found!");
+    }
+
+    @Test
     void handleGetBrandsMethodWhenEmptyDb() throws HttpException, IOException, PoolException, InterruptedException {
-        when(database.getCollection(HttpServerImpl.CollectionsMongoDb.BRANDS.name)).thenReturn(collection);
-        when(collection.find()).thenReturn(iterable);
-        when(iterable.sort(descending("id"))).thenReturn(iterable);
-        when(iterable.limit(1)).thenReturn(iterable);
-        when(iterable.first()).thenReturn(new Document());
+        mockWorkWithMongo(HttpServerImpl.CollectionsMongoDb.BRANDS, null);
         Response response = client.get("/brands");
         assertEquals(0, response.getBody().length, "Get brands method if not find doc, response should contains empty body");
         assertEquals(response.getStatus(), 404, "Get brands method if not find doc, response should has status 404 Not Found!");
+    }
 
+    @Test
+    void handleGetShopsMethodWhenEmptyDocument() throws HttpException, IOException, PoolException, InterruptedException {
+        mockWorkWithMongo(HttpServerImpl.CollectionsMongoDb.SHOPS, new Document());
+        Response response = client.get("/shops");
+        assertEquals(0, response.getBody().length, "Get shops method if doc empty, response should contains empty body");
+        assertEquals(response.getStatus(), 404, "Get shops method if doc empty, response should has status 404 Not Found!");
     }
 
     @Test
     void handleGetBrandsMethod() throws HttpException, IOException, PoolException, InterruptedException {
-        when(database.getCollection(HttpServerImpl.CollectionsMongoDb.BRANDS.name)).thenReturn(collection);
         Document brandsDocument = new Document("id", 123);
         String expectedAns = "[list brands]";
         brandsDocument.append("json", expectedAns);
-        when(collection.find()).thenReturn(iterable);
-        when(iterable.sort(descending("id"))).thenReturn(iterable);
-        when(iterable.limit(1)).thenReturn(iterable);
-        when(iterable.first()).thenReturn(brandsDocument);
+        mockWorkWithMongo(HttpServerImpl.CollectionsMongoDb.BRANDS, brandsDocument);
         Response response = client.get("/brands");
         assertEquals(response.getStatus(), 200, "Get brands method should return good status!");
         assertEquals(expectedAns, new String(response.getBody()), "Get brands method should return right doc");
@@ -135,16 +136,20 @@ class HttpServerImplTest {
 
     @Test
     void handleGetShopsMethod() throws HttpException, IOException, PoolException, InterruptedException {
-        when(database.getCollection(HttpServerImpl.CollectionsMongoDb.SHOPS.name)).thenReturn(collection);
         Document brandsDocument = new Document("id", 123);
         String expectedAns = "[list shops]";
         brandsDocument.append("json", expectedAns);
+        mockWorkWithMongo(HttpServerImpl.CollectionsMongoDb.SHOPS, brandsDocument);
+        Response response = client.get("/shops");
+        assertEquals(response.getStatus(), 200, "Get shops method should return good status!");
+        assertEquals(expectedAns, new String(response.getBody()), "Get shops method should return right doc");
+    }
+
+    private void mockWorkWithMongo(HttpServerImpl.CollectionsMongoDb shops, Document brandsDocument) {
+        when(database.getCollection(shops.name)).thenReturn(collection);
         when(collection.find()).thenReturn(iterable);
         when(iterable.sort(descending("id"))).thenReturn(iterable);
         when(iterable.limit(1)).thenReturn(iterable);
         when(iterable.first()).thenReturn(brandsDocument);
-        Response response = client.get("/shops");
-        assertEquals(response.getStatus(), 200, "Get shops method should return good status!");
-        assertEquals(expectedAns, new String(response.getBody()), "Get shops method should return right doc");
     }
 }

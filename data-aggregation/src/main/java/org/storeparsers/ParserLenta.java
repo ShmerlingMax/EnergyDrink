@@ -4,21 +4,22 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URL;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class ParserLenta extends Parser {
 
     private final String cookie;
+    private final String storeUrl;
 
-    public ParserLenta() {
-        this.cookie ="qrator_jsid=1671392014.424.kyS3IPzWeDk5rNrx-rmq7beradcm6hegoje4v1340lqkl26co";
+    public ParserLenta(String storeUrl) throws IOException {
+        this.cookie = "qrator_jsid=1671392014.424.kyS3IPzWeDk5rNrx-rmq7beradcm6hegoje4v1340lqkl26co";
+        this.storeUrl = "https://raw.githubusercontent.com/FlyingButteryTuna/tolstoyWAP/main/lenta.txt";
+        this.parseStore();
     }
+
     @Override
     public JsonObject parseStore() throws IOException {
         final String logoLink = "https://upload.wikimedia.org/wikipedia/commons/9/94/%D0%9B%D0%95%D0%9D%D0%A2%D0%90_%D0%BB%D0%BE%D0%B3%D0%BE.jpg";
@@ -27,8 +28,7 @@ public class ParserLenta extends Parser {
         JsonArray eDrinks = new JsonArray();
 
         String responseAll = "";
-        String[] commands = new String[]{"curl", "--cookie", cookie,
-                "https://lenta.com/catalog/bezalkogolnye-napitki/energetiki--i-sportivnye-napitki/energetiki/"};
+        String[] commands = new String[]{"curl", "--cookie", cookie, storeUrl};
         responseAll += getHtmlCurl(commands);
         Set<String> energyDrinks = getDrinksUrl(responseAll);
 
@@ -103,9 +103,9 @@ public class ParserLenta extends Parser {
 
     @Override
     public Set<String> getDrinksUrl(String html) throws IOException {
-        int productPosStart = 0;
+        int productPosStart = html.indexOf("https", 0);
         Set<String> energyDrinks = new HashSet<>();
-
+        html += "\n";
         while (productPosStart != -1) {
             int productLinkPosEnd = html.indexOf("\n", productPosStart);
             String productLink = html.substring(productPosStart, productLinkPosEnd);

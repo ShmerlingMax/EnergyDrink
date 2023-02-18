@@ -10,7 +10,7 @@ public class ParserLentaTest extends ParserTest {
     @Test
     void parseEnergyDrinkPage() throws IOException {
         String testHTML = readTxtHtml("lenta/lentaEnergyDrinkHtml.txt");
-        ParserLenta parser = new ParserLenta();
+        ParserLenta parser = new ParserLenta("https://lenta.com/catalog/bezalkogolnye-napitki/energetiki--i-sportivnye-napitki/energetiki/");
         String result = parser.parseEnergyDrinkPage(testHTML).toString();
 
         String expectedResult = readTxtHtml("lenta/lentaEnergyDrinkParseResult.txt").replace("\n", "");
@@ -20,7 +20,7 @@ public class ParserLentaTest extends ParserTest {
     @Test
     void getDrinksUrl() throws IOException {
         String testHTML = readTxtHtml("lenta/lentaDrinksUrlsHtml.txt");
-        ParserLenta parser = new ParserLenta();
+        ParserLenta parser = new ParserLenta("https://lenta.com/catalog/bezalkogolnye-napitki/energetiki--i-sportivnye-napitki/energetiki/");
         Set<String> result = parser.getDrinksUrl(testHTML);
         Set<String> expectedResult = readTxtStringsSet("lenta/lentaDrinksUrlsResult.txt");
         Assertions.assertEquals(result, expectedResult);

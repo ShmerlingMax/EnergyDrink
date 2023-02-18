@@ -16,6 +16,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ParserVkuster extends Parser{
+    private final String storeUrl;
+
+    public ParserVkuster(String storeUrl) throws IOException {
+        this.storeUrl = storeUrl;
+        this.parseStore();
+    }
     @Override
     public JsonObject parseStore() throws IOException {
         String url = "https://vkuster.ru/catalog/bezalkogolnye-napitki/energeticheskie-napitki/";
@@ -24,7 +30,7 @@ public class ParserVkuster extends Parser{
         JsonObject shopVkuster = new JsonObject();
         JsonArray eDrinks = new JsonArray();
 
-        Set<String> energyDrinks = getDrinksUrl(url);
+        Set<String> energyDrinks = getDrinksUrl(storeUrl);
 
         for (String energyDrink : energyDrinks) {
             eDrinks.add(parseEnergyDrinkPage(energyDrink));

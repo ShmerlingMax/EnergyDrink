@@ -11,7 +11,7 @@ public class ParserOkeyTest extends ParserTest {
     @Test
     void parseEnergyDrinkPage() throws IOException {
         String testHTML = readTxtHtml("okey/okeyEnergyDrinkHtml.txt");
-        ParserOkey parser = new ParserOkey();
+        ParserOkey parser = new ParserOkey("https://www.okeydostavka.ru/spb/goriachie-i-kholodnye-napitki/energeticheskie-napitki");
         String result = parser.parseEnergyDrinkPage(testHTML).toString();
 
         String expectedResult = readTxtHtml("okey/okeyEnergyDrinkParseResult.txt").replace("\n", "");
@@ -21,7 +21,7 @@ public class ParserOkeyTest extends ParserTest {
     @Test
     void getDrinksUrl() throws IOException {
         String testHTML = readTxtHtml("okey/okeyDrinksUrlsHtml.txt");
-        ParserOkey parser = new ParserOkey();
+        ParserOkey parser = new ParserOkey("https://www.okeydostavka.ru/spb/goriachie-i-kholodnye-napitki/energeticheskie-napitki");
         Set<String> result = parser.getDrinksUrl(testHTML);
         Set<String> expectedResult = readTxtStringsSet("okey/okeyDrinksUrlsResult.txt");
         Assertions.assertEquals(result, expectedResult);

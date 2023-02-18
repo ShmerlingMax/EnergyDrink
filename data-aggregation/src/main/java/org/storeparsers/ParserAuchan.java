@@ -11,13 +11,12 @@ import java.util.Set;
 
 public class ParserAuchan extends Parser {
     private final String cookie;
+    private final String storeUrl;
 
-    public ParserAuchan() {
-        this.cookie ="qrator_jsid=1671392014.424.kyS3IPzWeDk5rNrx-rmq7beradcm6hegoje4v1340lqkl26co";
-    }
-
-    public ParserAuchan(String cookie) {
-        this.cookie = cookie;
+    public ParserAuchan(String storeUrl) throws IOException {
+        this.cookie = "qrator_jsid=1671392014.424.kyS3IPzWeDk5rNrx-rmq7beradcm6hegoje4v1340lqkl26co";
+        this.storeUrl = "https://raw.githubusercontent.com/FlyingButteryTuna/tolstoyWAP/main/auchan.txt";
+        this.parseStore();
     }
 
     @Override
@@ -27,19 +26,14 @@ public class ParserAuchan extends Parser {
         JsonObject shopAuchan = new JsonObject();
         JsonArray eDrinks = new JsonArray();
 
-        String[] commands = new String[]{"curl", "--cookie", cookie,
-                "https://www.auchan.ru/catalog/voda-soki-napitki/energeticheskie-napitki/energeticheskie-napitki/?page=1"};
+        String[] commands = new String[]{"curl", "--cookie", cookie, storeUrl};
         String responseAll = getHtmlCurl(commands);
-        commands = new String[]{"curl", "--cookie", cookie,
-                "https://www.auchan.ru/catalog/voda-soki-napitki/energeticheskie-napitki/energeticheskie-napitki/?page=2"};
-        responseAll += getHtmlCurl(commands);
 
         Set<String> energyDrinks = getDrinksUrl(responseAll);
 
         for (String energyDrink : energyDrinks) {
             commands = new String[]{"curl", "--cookie", cookie, energyDrink};
             String drinkPage = getHtmlCurl(commands);
-            StoresParser.LOGGER.info(energyDrink);
 
             try {
                 eDrinks.add(parseEnergyDrinkPage(drinkPage));
@@ -115,13 +109,12 @@ public class ParserAuchan extends Parser {
 
     @Override
     public Set<String> getDrinksUrl(String html) throws IOException {
-        int productPosStart = 0;
+        int productPosStart = html.indexOf("https", 0);
+        html += "\n";
         Set<String> energyDrinks = new HashSet<>();
-
         while (productPosStart != -1) {
             int productLinkPosEnd = html.indexOf("\n", productPosStart);
             String productLink = html.substring(productPosStart, productLinkPosEnd);
-
             energyDrinks.add(productLink);
             productPosStart = html.indexOf("https", productLinkPosEnd);
         }

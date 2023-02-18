@@ -33,32 +33,27 @@ public class StoresParser extends TimerTask {
 
         Set<String> brands = new HashSet<>();
 
-        ParserAuchan parserAuchan = new ParserAuchan();
-        ParserLenta parserLenta = new ParserLenta();
-        ParserPerekrestok parserPerekrestok = new ParserPerekrestok();
-        ParserVkuster parserVkuster = new ParserVkuster();
-        ParserOkey parserOkey = new ParserOkey();
+        ParserAuchan parserAuchan = null;
+        ParserLenta parserLenta = null;
+        ParserPerekrestok parserPerekrestok = null;
+        ParserVkuster parserVkuster = null;
+        ParserOkey parserOkey = null;
+        try {
+            parserAuchan = new ParserAuchan("https://www.auchan.ru/catalog/voda-soki-napitki/energeticheskie-napitki/energeticheskie-napitki/?page=1");
+            parserLenta  = new ParserLenta("https://lenta.com/catalog/bezalkogolnye-napitki/energetiki--i-sportivnye-napitki/energetiki/");
+            parserPerekrestok = new ParserPerekrestok("https://www.perekrestok.ru/cat/c/206/energeticeskie-napitki");
+            parserVkuster = new ParserVkuster("https://vkuster.ru/catalog/bezalkogolnye-napitki/energeticheskie-napitki/");
+            parserOkey = new ParserOkey("https://www.okeydostavka.ru/spb/goriachie-i-kholodnye-napitki/energeticheskie-napitki");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         try {
-            LOGGER.info("Parsing Vkuster");
-            shopsArray.add(parserVkuster.parseStore());
-            brands.addAll(parserVkuster.brands);
-
-            LOGGER.info("Parsing Okey");
-            shopsArray.add(parserOkey.parseStore());
-            brands.addAll(parserOkey.brands);
-
-            LOGGER.info("Parsing Auchan");
-            shopsArray.add(parserAuchan.parseStore());
-            brands.addAll(parserAuchan.brands);
-
-            LOGGER.info("Parsing Lenta");
-            shopsArray.add(parserLenta.parseStore());
-            brands.addAll(parserLenta.brands);
-
-            LOGGER.info("Parsing Perekresok");
-            shopsArray.add(parserPerekrestok.parseStore());
-            brands.addAll(parserPerekrestok.brands);
+            parseShop("Parsing Vkuster", shopsArray, parserVkuster.parseStore(), brands, parserVkuster.brands);
+            parseShop("Parsing Okey", shopsArray, parserOkey.parseStore(), brands, parserOkey.brands);
+            parseShop("Parsing Auchan", shopsArray, parserAuchan.parseStore(), brands, parserAuchan.brands);
+            parseShop("Parsing Lenta", shopsArray, parserLenta.parseStore(), brands, parserLenta.brands);
+            parseShop("Parsing Perekresok", shopsArray, parserPerekrestok.parseStore(), brands, parserPerekrestok.brands);
         } catch (IOException e) {
             LOGGER.error("IOException In StoresParser", e);
             throw new RuntimeException(e);
@@ -73,7 +68,7 @@ public class StoresParser extends TimerTask {
         shopsJson.add("shops", shopsArray);
         brandsJson.add("brands", brandsArray);
 
-        LOGGER.info("Sending to mongodb");
+        /*LOGGER.info("Sending to mongodb");
         String rootName = System.getenv(Config.MONGO_INITDB_ROOT_USERNAME);
         String password = System.getenv(Config.MONGO_INITDB_ROOT_PASSWORD);
         String databaseName = System.getenv(Config.MONGO_INITDB_DATABASE);
@@ -87,16 +82,25 @@ public class StoresParser extends TimerTask {
 
         long time =  System.currentTimeMillis();
         MongoCollection<Document> brandsDocuments = database.getCollection("brands");
-        Document brandsDocument = new Document("id", time);
-        brandsDocument.append("json", brandsJson.toString());
-        brandsDocuments.insertOne(brandsDocument);
+        addDocToMongo(brandsJson, time, brandsDocuments);
 
         MongoCollection<Document> shopsDocuments = database.getCollection("shops");
-        Document shopsDocument = new Document("id", time);
-        shopsDocument.append("json", shopsJson.toString());
-        shopsDocuments.insertOne(shopsDocument);
-        mongoClient.close();
+        addDocToMongo(shopsJson, time, shopsDocuments);
+        mongoClient.close();*/
     }
+
+    private static void addDocToMongo(JsonObject json, long time, MongoCollection<Document> collection) {
+        Document brandsDocument = new Document("id", time);
+        brandsDocument.append("json", json.toString());
+        collection.insertOne(brandsDocument);
+    }
+
+    private static void parseShop(String nameShop, JsonArray shopsArray, JsonObject shop, Set<String> brands, Set<String> brandsShop) throws IOException {
+        LOGGER.info(nameShop);
+        shopsArray.add(shop);
+        brands.addAll(brandsShop);
+    }
+
     static class Config {
         private static final String MONGO_INITDB_ROOT_USERNAME = "MONGO_INITDB_ROOT_USERNAME";
         private static final String MONGO_INITDB_ROOT_PASSWORD = "MONGO_INITDB_ROOT_PASSWORD";

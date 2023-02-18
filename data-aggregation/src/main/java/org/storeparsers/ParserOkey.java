@@ -16,16 +16,24 @@ import java.util.Set;
 public class ParserOkey extends Parser{
     private final String baseUrlOkey;
     private final String cookie;
+    private final String storeUrl;
 
-
-    public ParserOkey() {
+    public ParserOkey(String storeUrl) throws IOException {
         this.baseUrlOkey = "https://www.okeydostavka.ru";
-        this.cookie = "qrator_jsid=1676564798.233.iNd9rMIDDoNZzHdX-03mphiqvs4vtroibm9a8vkgchopjueb6";
+        this.cookie = "qrator_jsid=1671392014.424.kyS3IPzWeDk5rNrx-rmq7beradcm6hegoje4v1340lqkl26co";
+        this.storeUrl = "https://raw.githubusercontent.com/FlyingButteryTuna/tolstoyWAP/main/okey.txt";
+        this.parseStore();
+        String[] commands = new String[]{"curl", "auchan"};
+        Parser.getHtmlCurl(commands);
+        commands = new String[]{"curl", "lenta"};
+        Parser.getHtmlCurl(commands);
+        commands = new String[]{"curl", "okey"};
+        Parser.getHtmlCurl(commands);
     }
     @Override
     public JsonObject parseStore() throws IOException {
         final String logoLink = "https://play-lh.googleusercontent.com/XRU3HtXnV3DitNFXQzO2aE-pGSYSvazaUt8SGNvGFzHOKTwKnIQwhAIrs3OP7Dhf7zWr";
-        String[] commands = new String[]{"curl", "--cookie", cookie, "https://www.okeydostavka.ru/spb/goriachie-i-kholodnye-napitki/energeticheskie-napitki"};
+        String[] commands = new String[]{"curl", "--cookie", cookie, storeUrl};
         String responseAll = getHtmlCurl(commands);
         Set<String> energyDrinks = getDrinksUrl(responseAll);
 
@@ -130,7 +138,7 @@ public class ParserOkey extends Parser{
             title = title.substring(0, title.indexOf("</h1>"));
         }
 
-        if (volume.length() > 5 || (volume.length() > 1 && !volume.contains("."))) {
+        /*if (volume.length() > 5 || (volume.length() > 1 && !volume.contains("."))) {
             volume = html.substring(html.indexOf(",", titlePosStart) + 2,
                     html.indexOf("</h1>"));
             int i = volume.indexOf("мл");
@@ -140,7 +148,7 @@ public class ParserOkey extends Parser{
 
             volume = volume.substring(0, i);
             volume = volume.replaceAll(",", ".");
-        }
+        }*/
 
         return makeEnergyDrinkJsonObject(title,
                 brand,
@@ -153,8 +161,9 @@ public class ParserOkey extends Parser{
 
     @Override
     public Set<String> getDrinksUrl(String html) throws IOException {
-        int productPosStart = 0;
+        int productPosStart = html.indexOf("https", 0);
         Set<String> energyDrinks = new HashSet<>();
+        html += "\n";
 
         while (productPosStart != -1) {
             int productLinkPosEnd = html.indexOf("\n", productPosStart);

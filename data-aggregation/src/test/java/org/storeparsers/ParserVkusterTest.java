@@ -12,7 +12,7 @@ public class ParserVkusterTest extends ParserTest {
     @Test
     void parseEnergyDrinkPage() throws IOException {
         String testHTML = readTxtHtml("vkuster/vkusterEnergyDrinkHtml.txt");
-        ParserVkuster parser = new ParserVkuster();
+        ParserVkuster parser = new ParserVkuster("https://vkuster.ru/catalog/bezalkogolnye-napitki/energeticheskie-napitki/");
         String result = parser.parseEnergyDrinkPage(testHTML).toString() + "\n";
 
         String expectedResult = readTxtHtml("vkuster/vkusterEnergyDrinkParseResult.txt");
@@ -22,7 +22,7 @@ public class ParserVkusterTest extends ParserTest {
     @Test
     void getDrinksUrl() throws IOException {
         String testHTML = readTxtHtml("vkuster/vkusterDrinksUrlsHtml.txt");
-        ParserVkuster parser = new ParserVkuster();
+        ParserVkuster parser = new ParserVkuster("https://vkuster.ru/catalog/bezalkogolnye-napitki/energeticheskie-napitki/");
         Set<String> result = parser.getDrinksUrl(testHTML);
 
         Set<String> expectedResult = readTxtStringsSet("vkuster/vkusterDrinksUrlsResult.txt");

@@ -3,21 +3,23 @@ package org.storeparsers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ParserPerekrestok extends Parser{
+    private final String storeUrl;
+
+    public ParserPerekrestok(String storeUrl) throws IOException {
+        this.storeUrl = "https://raw.githubusercontent.com/FlyingButteryTuna/tolstoyWAP/main/perekrestok.html";
+        this.parseStore();
+    }
     @Override
     public JsonObject parseStore() throws IOException {
         final String logoLink = "https://gidpopromo.ru/storage/2021/07/12/d68db4a606380cf445af4df5997420d5b61e3a52.jpg";
-        final String url = "https://www.perekrestok.ru/cat/c/206/energeticeskie-napitki";
 
-        String[] commands = new String[]{"curl", url};
+        String[] commands = new String[]{"curl", storeUrl};
         String responseAll = getHtmlCurl(commands);
 
         Set<String> energyDrinks = getDrinksUrl(responseAll);
@@ -28,7 +30,6 @@ public class ParserPerekrestok extends Parser{
         for (String energyDrink : energyDrinks) {
             commands = new String[]{"curl", energyDrink};
             String response = getHtmlCurl(commands);
-            StoresParser.LOGGER.info(energyDrink);
 
             try {
                 JsonObject eDrink = parseEnergyDrinkPage(response);
@@ -56,14 +57,14 @@ public class ParserPerekrestok extends Parser{
         final String newPriceKeyword = "<div class=\"price-new\">";
         final String oldPriceKeyword = "<div class=\"price-old\">";
         final String discountKeyword = "<div class=\"sc-xyEDr eYwDjP sc-irOPex koUUzn\">";
-        final String volumeKeyword = "class=\"product-info-string-value\">";
         boolean isDiscounted = true;
 
         int fullNamePosStart = html.indexOf(fullNameKeyword);
         String fullName = html.substring(fullNamePosStart + fullNameKeyword.length(),
                 html.indexOf(",", fullNamePosStart));
         String volume = html.substring(html.indexOf(",", fullNamePosStart) + 1,
-                html.indexOf("</h1>", html.indexOf(",", fullNamePosStart) + 1));
+                html.indexOf("</h1>",
+                        html.indexOf(",", fullNamePosStart) + 1));
 
         int i = volume.length() - 1;
         char tmp = volume.charAt(i);
@@ -74,14 +75,14 @@ public class ParserPerekrestok extends Parser{
         if (volume.contains("мл")) {
             volume = volume.substring(0, volume.indexOf("мл"));
         }
-        if (volume.contains("л")) {
+        /*if (volume.contains("л")) {
             volume = volume.substring(0, volume.indexOf("л"));
-        }
+        }*/
 
         double volumeTmp = Double.parseDouble(volume);
-        if (volumeTmp < 1) {
+        /*if (volumeTmp < 1) {
             volumeTmp *= 1000;
-        }
+        }*/
         int volumeRes = (int) volumeTmp;
 
         int brandPosStart = html.indexOf(brandKeyword);
@@ -92,7 +93,8 @@ public class ParserPerekrestok extends Parser{
         int imgLinkPosStart1 = html.indexOf(imgKeyword);
         int imgLinkPosStart2 = html.indexOf("<img src=\"", imgLinkPosStart1);
         String imgLink = html.substring(imgLinkPosStart2 + "<img src=\"".length(),
-                html.indexOf("\"", imgLinkPosStart2 + "<img src=\"".length()));
+                html.indexOf("\"", imgLinkPosStart2 +
+                        "<img src=\"".length()));
 
 
         String span = "<span>";

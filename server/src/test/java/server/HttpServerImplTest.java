@@ -28,6 +28,7 @@ import static com.mongodb.client.model.Sorts.descending;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
+import static server.Server.createConfigFromPort;
 
 @ExtendWith(MockitoExtension.class)
 class HttpServerImplTest {
@@ -46,13 +47,7 @@ class HttpServerImplTest {
     @BeforeEach
     void setUp() throws IOException {
         MockitoAnnotations.openMocks(this);
-        HttpServerConfig httpConfig = new HttpServerConfig();
-        AcceptorConfig acceptor = new AcceptorConfig();
-        acceptor.port = PORT;
-        acceptor.reusePort = true;
-        httpConfig.acceptors = new AcceptorConfig[]{acceptor};
-
-        server = new HttpServerImpl(httpConfig, database);
+        server = new HttpServerImpl(createConfigFromPort(PORT), database);
         server.start();
         client = new HttpClient(new ConnectionString("http://127.0.0.1:8080"));
     }

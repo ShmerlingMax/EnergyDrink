@@ -15,18 +15,25 @@ import java.util.concurrent.CompletableFuture;
 public final class ServiceImpl implements Service {
 
     private HttpServer server;
-
-    private static final int SERVER_PORT = 8080;
     private static final int MONGODB_PORT = 27017;
     MongoClient mongoClient;
+    private static final int SERVER_PORT = 8080;
+
+    private final int port;
+
 
     ServiceImpl() {
+        this(SERVER_PORT);
     }
 
-    private static HttpServerConfig createConfigFromPort() {
+    ServiceImpl(int port) {
+        this.port = port;
+    }
+
+    private static HttpServerConfig createConfigFromPort(int port) {
         HttpServerConfig httpConfig = new HttpServerConfig();
         AcceptorConfig acceptor = new AcceptorConfig();
-        acceptor.port = SERVER_PORT;
+        acceptor.port = port;
         acceptor.reusePort = true;
         httpConfig.acceptors = new AcceptorConfig[]{acceptor};
         return httpConfig;
@@ -51,7 +58,7 @@ public final class ServiceImpl implements Service {
         ServerAddress serverAddress = new ServerAddress(host, MONGODB_PORT);
         mongoClient = new MongoClient(serverAddress, credential, MongoClientOptions.builder().build());
         MongoDatabase database = mongoClient.getDatabase(databaseName);
-        server = new HttpServerImpl(createConfigFromPort(), database);
+        server = new HttpServerImpl(createConfigFromPort(port), database);
         server.start();
         return CompletableFuture.completedFuture(null);
     }

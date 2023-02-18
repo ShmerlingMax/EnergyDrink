@@ -26,9 +26,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static com.mongodb.client.model.Sorts.descending;
-import static one.nio.http.Request.METHOD_DELETE;
 import static one.nio.http.Request.METHOD_GET;
-import static one.nio.http.Request.METHOD_PUT;
+import static one.nio.http.Request.METHOD_HEAD;
 
 public class HttpServerImpl extends HttpServer {
 
@@ -39,10 +38,7 @@ public class HttpServerImpl extends HttpServer {
     private static final int SIZE_QUEUE = 128;
     private static final int COUNT_CORES = 4;
 
-    private static final Set<Integer> SUPPORTED_METHODS = Set.of(METHOD_GET, METHOD_PUT, METHOD_DELETE);
-    private static final Response BAD_RESPONSE = new Response(Response.BAD_REQUEST, Response.EMPTY);
-    private static final Response METHOD_NOT_ALLOWED = new Response(Response.METHOD_NOT_ALLOWED, Response.EMPTY);
-    private static final Response SERVICE_UNAVAILABLE = new Response(Response.SERVICE_UNAVAILABLE, Response.EMPTY);
+    private static final Set<Integer> SUPPORTED_METHODS = Set.of(METHOD_GET, METHOD_HEAD);
     private final MongoDatabase database;
     private final PathMapper handlerMapper = new PathMapper();
 
@@ -59,17 +55,14 @@ public class HttpServerImpl extends HttpServer {
         super(httpServerConfig, routers);
         this.database = database;
         handlerMapper.add(PATH_BRANDS, new int[]{METHOD_GET}, this::handleGetBrands);
+        handlerMapper.add(PATH_BRANDS, new int[]{METHOD_HEAD}, this::handleHeadBrands);
         handlerMapper.add(PATH_SHOPS, new int[]{METHOD_GET}, this::handleGetShops);
-    }
-
-    @Override
-    public void handleDefault(Request request, HttpSession session) throws IOException {
-        session.sendResponse(BAD_RESPONSE);
+        handlerMapper.add(PATH_SHOPS, new int[]{METHOD_HEAD}, this::handleHeadShops);
     }
 
     private static void handleUnavailable(HttpSession session) {
         try {
-            session.sendResponse(SERVICE_UNAVAILABLE);
+            session.sendError(Response.SERVICE_UNAVAILABLE, null);
         } catch (IOException ioException) {
             try {
                 LOGGER.error("Error when send SERVICE_UNAVAILABLE response", ioException);
@@ -95,12 +88,12 @@ public class HttpServerImpl extends HttpServer {
             try {
                 String path = request.getPath();
                 if (!path.equals(PATH_BRANDS) && !path.equals(PATH_SHOPS)) {
-                    session.sendResponse(BAD_RESPONSE);
+                    session.sendResponse(badRequest());
                     return;
                 }
                 int methodName = request.getMethod();
                 if (!SUPPORTED_METHODS.contains(methodName)) {
-                    session.sendResponse(METHOD_NOT_ALLOWED);
+                    session.sendResponse(methodNotAllowed());
                     return;
                 }
 
@@ -110,7 +103,6 @@ public class HttpServerImpl extends HttpServer {
                     return;
                 }
                 handleDefault(request, session);
-
             } catch (IOException e) {
                 handleUnavailable(session);
             }
@@ -138,8 +130,16 @@ public class HttpServerImpl extends HttpServer {
         handleGetFromMongo(session, brands);
     }
 
-    private void handleGetFromMongo(HttpSession session, MongoCollection<Document> brands) throws IOException {
-        Document doc = brands.find()
+    private void handleHeadShops(@Nonnull Request request, HttpSession session) throws IOException {
+        session.sendResponse(new Response(Response.OK, Response.EMPTY));
+    }
+
+    private void handleHeadBrands(@Nonnull Request request, HttpSession session) throws IOException {
+        session.sendResponse(new Response(Response.OK, Response.EMPTY));
+    }
+
+    private void handleGetFromMongo(HttpSession session, MongoCollection<Document> collection) throws IOException {
+        Document doc = collection.find()
                 .sort(descending("id"))
                 .limit(1)
                 .first();
@@ -151,6 +151,14 @@ public class HttpServerImpl extends HttpServer {
 
         String brandJson = doc.getString("json");
         session.sendResponse(new Response(Response.OK, brandJson.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    private static Response badRequest() {
+        return new Response(Response.BAD_REQUEST, Response.EMPTY);
+    }
+
+    private static Response methodNotAllowed() {
+        return new Response(Response.METHOD_NOT_ALLOWED, Response.EMPTY);
     }
 
     enum CollectionsMongoDb {

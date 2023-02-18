@@ -7,5 +7,5 @@ public interface Service {
 
     CompletableFuture<?> start() throws IOException;
 
-    CompletableFuture<?> stop() throws IOException;
+    CompletableFuture<?> stop();
 }

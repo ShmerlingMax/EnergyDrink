@@ -19,4 +19,4 @@ jobs:
 #      - working-directory: ./server
 #        run: ./gradlew test
       - working-directory: ./data-aggregation
-        run: ./gradlew test
+        run: ./gradlew test -i

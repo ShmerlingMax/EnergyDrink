@@ -1,7 +1,7 @@
 import 'package:energy_drink/domain/models/selection_model/selection_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../mock_data.dart';
+import '../../../mock_data.dart';
 
 void main() {
   group('Test SelectionModel', () {

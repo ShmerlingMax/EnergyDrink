@@ -5,7 +5,7 @@ import 'package:energy_drink/domain/models/shop_model/shop_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../mock_data.dart';
+import '../../../mock_data.dart';
 
 void main() {
   group('Test Shop', () {

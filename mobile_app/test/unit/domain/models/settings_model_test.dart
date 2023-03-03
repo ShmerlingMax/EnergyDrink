@@ -2,7 +2,7 @@ import 'package:energy_drink/domain/models/aggregation_model/aggregation_model.d
 import 'package:energy_drink/domain/models/settings_model/settings_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../mock_data.dart';
+import '../../../mock_data.dart';
 
 void main() {
   group('Test Settings', () {

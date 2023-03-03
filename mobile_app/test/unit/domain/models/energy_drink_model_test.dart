@@ -4,7 +4,7 @@ import 'package:energy_drink/domain/models/energy_drink_model/energy_drink_model
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../mock_data.dart';
+import '../../../mock_data.dart';
 
 void main() {
   group('Test EnergyDrink', () {

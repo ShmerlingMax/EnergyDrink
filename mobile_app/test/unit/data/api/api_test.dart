@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../mock_data.dart';
+import '../../../mock_data.dart';
 
 class MockRequestOptions extends Mock implements RequestOptions {}
 
@@ -16,6 +16,10 @@ void main() {
   setUpAll(() {
     mockDioAdapter = MockDioAdapter();
     registerFallbackValue(MockRequestOptions());
+  });
+
+  setUp(() {
+    Api().test = true;
   });
 
   group('Test API', () {

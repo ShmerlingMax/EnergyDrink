@@ -4,35 +4,37 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:energy_drink/data/services/shared_pref_service.dart';
 import 'package:energy_drink/domain/models/shop_model/shop_model.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 import 'mock_dio_adapter.dart';
 
 class ApiConfig {
-  static const baseUrl = "http://84.201.139.105:8080";
-  static const brands = "/brands";
-  static const shops = "/shops";
+  static var baseUrl = "http://158.160.44.225:8080";
+  static var brands = "/brands";
+  static var shops = "/shops";
 }
 
 class Api {
+  var test = false;
+
   static final Api _singleton = Api._();
 
   Api._();
 
-  factory Api() {
+  factory Api([bool? test]) {
     return _singleton;
   }
 
-  final _baseOptions = BaseOptions(
-    baseUrl: ApiConfig.baseUrl,
-    connectTimeout: 5000,
-    receiveTimeout: 10000,
-    sendTimeout: 5000,
-  );
+  get _baseOptions => BaseOptions(
+        baseUrl: ApiConfig.baseUrl,
+        connectTimeout: 5000,
+        receiveTimeout: 10000,
+        sendTimeout: 5000,
+      );
 
   Dio get client {
-    final dio = Dio(_baseOptions);
-    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+    var dio = Dio(_baseOptions);
+
+    if (test) {
       dio.httpClientAdapter = MockDioAdapter();
     }
     return dio;

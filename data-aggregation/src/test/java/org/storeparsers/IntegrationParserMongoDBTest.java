@@ -17,6 +17,9 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
+import static com.mongodb.client.model.Sorts.descending;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class IntegrationParserMongoDBTest {
     private static Transitions transitions;
@@ -45,8 +48,38 @@ public class IntegrationParserMongoDBTest {
     }
 
     @Test
-    void someTest() {}
+    void testIntegrationParserMongo() {
+        StoresParser parser = new StoresParser(mongoClient, "energy_drinks");
+        parser.run();
+        String brands = parser.getBrands().toString();
+        String shops = parser.getShops().toString();
 
+        assertEquals(brands, getFromMongoDb(database, "brands"));
+        assertEquals(shops, getFromMongoDb(database, "shops"));
+    }
+
+    @Test
+    void testIntegrationParserMongoWithOldDataInMongo() {
+        insertInDataBase(database, "shops", "[json shops]");
+        insertInDataBase(database, "brands", "[json brands]");
+        StoresParser parser = new StoresParser(mongoClient, "energy_drinks");
+        parser.run();
+        String brands = parser.getBrands().toString();
+        String shops = parser.getShops().toString();
+
+        assertEquals(brands, getFromMongoDb(database, "brands"));
+        assertEquals(shops, getFromMongoDb(database, "shops"));
+    }
+
+
+    private static String getFromMongoDb(MongoDatabase database, String nameCollection) {
+        MongoCollection<Document> documents = database.getCollection(nameCollection);
+        Document document = documents.find().sort(descending("id")).limit(1).first();
+        if (document == null) {
+            return "";
+        }
+        return document.getString("json");
+    }
 
     private static void insertInDataBase(MongoDatabase database, String nameCollection, String json) {
         MongoCollection<Document> shopsDocuments = database.getCollection(nameCollection);

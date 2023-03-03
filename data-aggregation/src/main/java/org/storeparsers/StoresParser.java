@@ -78,6 +78,8 @@ public class StoresParser extends TimerTask {
         long time =  System.currentTimeMillis();
         MongoCollection<Document> brandsDocuments = database.getCollection("brands");
         addDocToMongo(brandsJson, time, brandsDocuments);
+        MongoCollection<Document> shopsDocuments = database.getCollection("shops");
+        addDocToMongo(shopsJson, time, shopsDocuments);
     }
 
     public JsonObject getBrands() {
@@ -89,9 +91,9 @@ public class StoresParser extends TimerTask {
     }
 
     private static void addDocToMongo(JsonObject json, long time, MongoCollection<Document> collection) {
-        Document brandsDocument = new Document("id", time);
-        brandsDocument.append("json", json.toString());
-        collection.insertOne(brandsDocument);
+        Document document = new Document("id", time);
+        document.append("json", json.toString());
+        collection.insertOne(document);
     }
 
     private static void parseShop(String nameShop, JsonArray shopsArray, Parser parser, Set<String> brandsShop) throws IOException {

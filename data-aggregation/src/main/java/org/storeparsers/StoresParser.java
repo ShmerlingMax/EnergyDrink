@@ -56,10 +56,10 @@ public class StoresParser extends TimerTask {
 
         try {
             parseShop("Parsing Vkuster", shopsArray, parserVkuster, brands);
-//            parseShop("Parsing Okey", shopsArray, parserOkey, brands);
-//            parseShop("Parsing Auchan", shopsArray, parserAuchan, brands);
-//            parseShop("Parsing Lenta", shopsArray, parserLenta, brands);
-//            parseShop("Parsing Perekresok", shopsArray, parserPerekrestok, brands);
+            parseShop("Parsing Okey", shopsArray, parserOkey, brands);
+            parseShop("Parsing Auchan", shopsArray, parserAuchan, brands);
+            parseShop("Parsing Lenta", shopsArray, parserLenta, brands);
+            parseShop("Parsing Perekresok", shopsArray, parserPerekrestok, brands);
         } catch (IOException e) {
             LOGGER.error("IOException In StoresParser", e);
         }

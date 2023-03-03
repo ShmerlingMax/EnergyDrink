@@ -3,9 +3,6 @@ package org.storeparsers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.apache.commons.logging.Log;
@@ -18,17 +15,25 @@ import java.util.*;
 public class StoresParser extends TimerTask {
 
     public static final Log LOGGER = LogFactory.getLog(StoresParser.class);
+    private final MongoClient mongoClient;
+    private final String databaseName;
 
-    private static final int MONGODB_PORT = 27017;
+    private JsonObject brandsJson;
+    private JsonObject shopsJson;
+
+    public StoresParser(MongoClient mongoClient, String databaseName) {
+        this.mongoClient = mongoClient;
+        this.databaseName = databaseName;
+    }
 
     @Override
     public void run() {
         Locale.setDefault(new Locale("en", "RU"));
         LOGGER.info("Locale: " + Locale.getDefault());
 
-        JsonObject shopsJson = new JsonObject();
+        shopsJson = new JsonObject();
         JsonArray shopsArray = new JsonArray();
-        JsonObject brandsJson = new JsonObject();
+        brandsJson = new JsonObject();
         JsonArray brandsArray = new JsonArray();
 
         Set<String> brands = new HashSet<>();
@@ -67,40 +72,20 @@ public class StoresParser extends TimerTask {
 
         shopsJson.add("shops", shopsArray);
         brandsJson.add("brands", brandsArray);
-
-        try{
-            BufferedWriter writer = new BufferedWriter(new FileWriter("shops.txt"));
-            String tmp = shopsJson.toString();
-            writer.write(tmp);
-            writer.close();
-
-            BufferedWriter writer1 = new BufferedWriter(new FileWriter("brands.txt"));
-            tmp = brands.toString();
-            writer1.write(tmp);
-            writer1.close();
-        }catch(RuntimeException | IOException c){
-
-        }
-
         LOGGER.info("Sending to mongodb");
-        String rootName = System.getenv(Config.MONGO_INITDB_ROOT_USERNAME);
-        String password = System.getenv(Config.MONGO_INITDB_ROOT_PASSWORD);
-        String databaseName = System.getenv(Config.MONGO_INITDB_DATABASE);
-        String host = System.getenv(Config.MONGO_HOSTNAME);
-
-        MongoCredential credential = MongoCredential.createCredential(rootName, databaseName, password.toCharArray());
-
-        ServerAddress serverAddress = new ServerAddress(host, MONGODB_PORT);
-        MongoClient mongoClient = new MongoClient(serverAddress, credential, MongoClientOptions.builder().build());
         MongoDatabase database = mongoClient.getDatabase(databaseName);
 
         long time =  System.currentTimeMillis();
         MongoCollection<Document> brandsDocuments = database.getCollection("brands");
         addDocToMongo(brandsJson, time, brandsDocuments);
+    }
 
-        MongoCollection<Document> shopsDocuments = database.getCollection("shops");
-        addDocToMongo(shopsJson, time, shopsDocuments);
-        mongoClient.close();
+    public JsonObject getBrands() {
+        return brandsJson;
+    }
+
+    public JsonObject getShops() {
+        return shopsJson;
     }
 
     private static void addDocToMongo(JsonObject json, long time, MongoCollection<Document> collection) {
@@ -115,10 +100,4 @@ public class StoresParser extends TimerTask {
         brandsShop.addAll(parser.brands);
     }
 
-    static class Config {
-        private static final String MONGO_INITDB_ROOT_USERNAME = "MONGO_INITDB_ROOT_USERNAME";
-        private static final String MONGO_INITDB_ROOT_PASSWORD = "MONGO_INITDB_ROOT_PASSWORD";
-        private static final String MONGO_INITDB_DATABASE = "MONGO_INITDB_DATABASE";
-        private static final String MONGO_HOSTNAME = "MONGO_HOSTNAME";
-    }
 }

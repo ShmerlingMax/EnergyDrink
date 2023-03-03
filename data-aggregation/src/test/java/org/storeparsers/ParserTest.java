@@ -1,14 +1,21 @@
 package org.storeparsers;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 public class ParserTest {
+    @BeforeEach
+    void setLocale() {
+        Locale.setDefault(new Locale("en", "RU"));
+    }
+
     String readTxtHtml(String fileName) throws IOException {
         StringBuilder response;
         String line;

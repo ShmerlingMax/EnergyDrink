@@ -8,14 +8,15 @@ import java.io.IOException;
 import java.util.Set;
 
 class ParserAuchanTest extends ParserTest {
+
     @Test
     void parseEnergyDrinkPage() throws IOException {
         String testHTML = readTxtHtml("auchan/auchanEnergyDrinkHtml.txt");
         ParserAuchan parser = new ParserAuchan("https://www.auchan.ru/catalog/voda-soki-napitki/energeticheskie-napitki/energeticheskie-napitki/?page=1");
-//        String result = parser.parseEnergyDrinkPage(testHTML).toString();
-//
-//        String expectedResult = readTxtHtml("auchan/auchanEnergyDrinkParseResult.txt").replace("\n", "");
-//        Assertions.assertEquals(expectedResult, result);
+        String result = parser.parseEnergyDrinkPage(testHTML).toString();
+
+        String expectedResult = readTxtHtml("auchan/auchanEnergyDrinkParseResult.txt").replace("\n", "");
+        Assertions.assertEquals(expectedResult, result);
     }
 
     @Test

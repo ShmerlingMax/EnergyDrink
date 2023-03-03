@@ -149,8 +149,8 @@ public class HttpServerImpl extends HttpServer {
             return;
         }
 
-        String brandJson = doc.getString("json");
-        session.sendResponse(new Response(Response.OK, brandJson.getBytes(StandardCharsets.UTF_8)));
+        String json = doc.getString("json");
+        session.sendResponse(new Response(Response.OK, json.getBytes(StandardCharsets.UTF_8)));
     }
 
     private static Response badRequest() {

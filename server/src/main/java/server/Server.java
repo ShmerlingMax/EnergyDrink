@@ -12,11 +12,6 @@ import one.nio.server.AcceptorConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 public class Server {
 
     private static final Log LOGGER = LogFactory.getLog(Server.class);
@@ -29,15 +24,12 @@ public class Server {
             String password = System.getenv(Config.MONGO_INITDB_ROOT_PASSWORD);
             String databaseName = System.getenv(Config.MONGO_INITDB_DATABASE);
             String host = System.getenv(Config.MONGO_HOSTNAME);
-
             MongoCredential credential = MongoCredential.createCredential(rootName, databaseName, password.toCharArray());
-
             ServerAddress serverAddress = new ServerAddress(host, MONGODB_PORT);
-            try (MongoClient mongoClient = new MongoClient(serverAddress, credential, MongoClientOptions.builder().build())){
-                MongoDatabase database = mongoClient.getDatabase(databaseName);
-                HttpServer server = new HttpServerImpl(createConfigFromPort(SERVER_PORT), database);
-                server.start();
-            }
+            MongoClient mongoClient = new MongoClient(serverAddress, credential, MongoClientOptions.builder().build());
+            MongoDatabase database = mongoClient.getDatabase(databaseName);
+            HttpServer server = new HttpServerImpl(createConfigFromPort(SERVER_PORT), database);
+            server.start();
         } catch (Exception e) {
             LOGGER.error(e);
         }

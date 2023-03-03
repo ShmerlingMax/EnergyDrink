@@ -43,7 +43,7 @@ services:
   server-test:
     image: nikita17th/server-test:latest
     ports:
-      - "8081:8081"
+      - "8084:8084"
     networks:
       vpcbr:
         ipv4_address: 173.18.0.5

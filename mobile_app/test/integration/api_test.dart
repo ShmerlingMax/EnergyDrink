@@ -85,7 +85,7 @@ void main() {
       SharedPreferences.setMockInitialValues({});
       await SharedPrefService.init();
 
-      //ApiConfig.baseUrl = 'error';
+      ApiConfig.baseUrl = 'error';
 
       expect((await Api().getBrands()).isEmpty, equals(true));
     });

@@ -21,14 +21,7 @@ public class ParserOkey extends Parser{
     public ParserOkey(String storeUrl) throws IOException {
         this.baseUrlOkey = "https://www.okeydostavka.ru";
         this.cookie = "qrator_jsid=1671392014.424.kyS3IPzWeDk5rNrx-rmq7beradcm6hegoje4v1340lqkl26co";
-        this.storeUrl = "https://raw.githubusercontent.com/FlyingButteryTuna/tolstoyWAP/main/okey.txt";
-        this.parseStore();
-        String[] commands = new String[]{"curl", "auchan"};
-        Parser.getHtmlCurl(commands);
-        commands = new String[]{"curl", "lenta"};
-        Parser.getHtmlCurl(commands);
-        commands = new String[]{"curl", "okey"};
-        Parser.getHtmlCurl(commands);
+        this.storeUrl = storeUrl;
     }
     @Override
     public JsonObject parseStore() throws IOException {
@@ -138,7 +131,7 @@ public class ParserOkey extends Parser{
             title = title.substring(0, title.indexOf("</h1>"));
         }
 
-        /*if (volume.length() > 5 || (volume.length() > 1 && !volume.contains("."))) {
+        if (volume.length() > 5 || (volume.length() > 1 && !volume.contains("."))) {
             volume = html.substring(html.indexOf(",", titlePosStart) + 2,
                     html.indexOf("</h1>"));
             int i = volume.indexOf("мл");
@@ -148,7 +141,7 @@ public class ParserOkey extends Parser{
 
             volume = volume.substring(0, i);
             volume = volume.replaceAll(",", ".");
-        }*/
+        }
 
         return makeEnergyDrinkJsonObject(title,
                 brand,

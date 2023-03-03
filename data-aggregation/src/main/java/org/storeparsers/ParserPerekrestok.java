@@ -12,8 +12,7 @@ public class ParserPerekrestok extends Parser{
     private final String storeUrl;
 
     public ParserPerekrestok(String storeUrl) throws IOException {
-        this.storeUrl = "https://raw.githubusercontent.com/FlyingButteryTuna/tolstoyWAP/main/perekrestok.html";
-        this.parseStore();
+        this.storeUrl = storeUrl;
     }
     @Override
     public JsonObject parseStore() throws IOException {
@@ -75,14 +74,14 @@ public class ParserPerekrestok extends Parser{
         if (volume.contains("мл")) {
             volume = volume.substring(0, volume.indexOf("мл"));
         }
-        /*if (volume.contains("л")) {
+        if (volume.contains("л")) {
             volume = volume.substring(0, volume.indexOf("л"));
-        }*/
+        }
 
         double volumeTmp = Double.parseDouble(volume);
-        /*if (volumeTmp < 1) {
+        if (volumeTmp < 1) {
             volumeTmp *= 1000;
-        }*/
+        }
         int volumeRes = (int) volumeTmp;
 
         int brandPosStart = html.indexOf(brandKeyword);

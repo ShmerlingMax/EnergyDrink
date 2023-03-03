@@ -49,11 +49,11 @@ public class StoresParser extends TimerTask {
         }
 
         try {
-            parseShop("Parsing Vkuster", shopsArray, parserVkuster.parseStore(), brands, parserVkuster.brands);
-            parseShop("Parsing Okey", shopsArray, parserOkey.parseStore(), brands, parserOkey.brands);
-            parseShop("Parsing Auchan", shopsArray, parserAuchan.parseStore(), brands, parserAuchan.brands);
-            parseShop("Parsing Lenta", shopsArray, parserLenta.parseStore(), brands, parserLenta.brands);
-            parseShop("Parsing Perekresok", shopsArray, parserPerekrestok.parseStore(), brands, parserPerekrestok.brands);
+            parseShop("Parsing Vkuster", shopsArray, parserVkuster, brands);
+            parseShop("Parsing Okey", shopsArray, parserOkey, brands);
+            parseShop("Parsing Auchan", shopsArray, parserAuchan, brands);
+            parseShop("Parsing Lenta", shopsArray, parserLenta, brands);
+            parseShop("Parsing Perekresok", shopsArray, parserPerekrestok, brands);
         } catch (IOException e) {
             LOGGER.error("IOException In StoresParser", e);
             throw new RuntimeException(e);
@@ -68,7 +68,21 @@ public class StoresParser extends TimerTask {
         shopsJson.add("shops", shopsArray);
         brandsJson.add("brands", brandsArray);
 
-        /*LOGGER.info("Sending to mongodb");
+        try{
+            BufferedWriter writer = new BufferedWriter(new FileWriter("shops.txt"));
+            String tmp = shopsJson.toString();
+            writer.write(tmp);
+            writer.close();
+
+            BufferedWriter writer1 = new BufferedWriter(new FileWriter("brands.txt"));
+            tmp = brands.toString();
+            writer1.write(tmp);
+            writer1.close();
+        }catch(RuntimeException | IOException c){
+
+        }
+
+        LOGGER.info("Sending to mongodb");
         String rootName = System.getenv(Config.MONGO_INITDB_ROOT_USERNAME);
         String password = System.getenv(Config.MONGO_INITDB_ROOT_PASSWORD);
         String databaseName = System.getenv(Config.MONGO_INITDB_DATABASE);
@@ -86,7 +100,7 @@ public class StoresParser extends TimerTask {
 
         MongoCollection<Document> shopsDocuments = database.getCollection("shops");
         addDocToMongo(shopsJson, time, shopsDocuments);
-        mongoClient.close();*/
+        mongoClient.close();
     }
 
     private static void addDocToMongo(JsonObject json, long time, MongoCollection<Document> collection) {
@@ -95,10 +109,10 @@ public class StoresParser extends TimerTask {
         collection.insertOne(brandsDocument);
     }
 
-    private static void parseShop(String nameShop, JsonArray shopsArray, JsonObject shop, Set<String> brands, Set<String> brandsShop) throws IOException {
+    private static void parseShop(String nameShop, JsonArray shopsArray, Parser parser, Set<String> brandsShop) throws IOException {
         LOGGER.info(nameShop);
-        shopsArray.add(shop);
-        brands.addAll(brandsShop);
+        shopsArray.add(parser.parseStore());
+        brandsShop.addAll(parser.brands);
     }
 
     static class Config {

@@ -20,7 +20,6 @@ public class ParserVkuster extends Parser{
 
     public ParserVkuster(String storeUrl) throws IOException {
         this.storeUrl = storeUrl;
-        this.parseStore();
     }
     @Override
     public JsonObject parseStore() throws IOException {
@@ -48,19 +47,17 @@ public class ParserVkuster extends Parser{
         HashMap<String, String> drinksNames = new HashMap<>();
         drinksNames.put("Gorilla", "Горилла");
         drinksNames.put("Adrenaline", "Адреналин");
-        boolean isDiscounted = true;
+        boolean isDiscounted = false;
 
         Element energyDrink = Jsoup.parse(html);
 
-        Elements oldPriceClass = energyDrink.select("div[class=\"product__hint grey\"]");
+        Elements oldPriceClass = energyDrink.select("span[class=\"good-discounted-price\"]");
         if (oldPriceClass.isEmpty()) {
-            isDiscounted = false;
-            oldPriceClass = energyDrink.select("span[class=\"product__price\"]");
-
+            isDiscounted = true;
         }
 
         String oldPrice = oldPriceClass.text();
-        oldPrice = oldPrice.substring(0, oldPrice.length() - 1);
+        oldPrice = oldPrice.substring(0, oldPrice.length() - 2);
         String newPrice;
         if (isDiscounted) {
             newPrice = energyDrink.select("span[class=\"product__price promo\"]").text();
@@ -71,7 +68,7 @@ public class ParserVkuster extends Parser{
         }
 
 
-        String fullName = energyDrink.select("div[class=\"product__description\"]").text();
+        String fullName = energyDrink.select("a[class=\"card-text py-2\"]").text();
         String volume = "";
         Pattern p = Pattern.compile("(\\d+(?:\\.\\d+))");
         Matcher m = p.matcher(fullName);
@@ -90,8 +87,8 @@ public class ParserVkuster extends Parser{
             }
         }
 
-        String imgLink = energyDrink.select("div[class=\"product__cover\"]").attr("style");
-        imgLink = baseUrl + imgLink.substring(imgLink.indexOf("url") + 5, imgLink.length() - 2);
+        String imgLink = energyDrink.select("img[class=\"card-img-top\"]").attr("src");
+        imgLink = baseUrl + imgLink;
 
         double oldPricef = Double.parseDouble(oldPrice.substring(0, oldPrice.length() - 1));
         double newPricef = Double.parseDouble(newPrice.substring(0, newPrice.length() - 1));
@@ -99,20 +96,22 @@ public class ParserVkuster extends Parser{
         DecimalFormat df = new DecimalFormat("#.00");
         discount = Double.parseDouble(df.format(discount));
 
-        return makeEnergyDrinkJsonObject(fullName,
+        JsonObject result = makeEnergyDrinkJsonObject(fullName,
                 brand,
                 imgLink,
                 (int) (Double.parseDouble(volume) * 1000),
                 oldPricef,
                 newPricef,
                 discount);
+
+        return  result;
     }
 
     @Override
     public Set<String> getDrinksUrl(String html) throws IOException {;
         org.jsoup.nodes.Document mainPage = Jsoup.connect(html).get();
         Set<String> energyDrinksRes = new HashSet<>();
-        Elements energyDrinks = mainPage.select("div[class=\"col-6 col-md-4\"]");
+        Elements energyDrinks = mainPage.select("div[class=\"col-md-4 \"]");
         for (Element energyDrink : energyDrinks) {
             energyDrinksRes.add(energyDrink.html().replace("\n", ""));
         }

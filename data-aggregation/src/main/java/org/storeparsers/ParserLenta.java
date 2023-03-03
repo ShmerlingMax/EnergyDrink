@@ -16,8 +16,7 @@ public class ParserLenta extends Parser {
 
     public ParserLenta(String storeUrl) throws IOException {
         this.cookie = "qrator_jsid=1671392014.424.kyS3IPzWeDk5rNrx-rmq7beradcm6hegoje4v1340lqkl26co";
-        this.storeUrl = "https://raw.githubusercontent.com/FlyingButteryTuna/tolstoyWAP/main/lenta.txt";
-        this.parseStore();
+        this.storeUrl = storeUrl;
     }
 
     @Override

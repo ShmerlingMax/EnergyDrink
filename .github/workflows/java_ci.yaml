@@ -17,6 +17,6 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 #      - working-directory: ./server
-#        run: ./gradlew test
+#        run: ./gradlew test -i
       - working-directory: ./data-aggregation
         run: ./gradlew test -i

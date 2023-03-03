@@ -1,6 +1,13 @@
 plugins {
     id 'java'
+    id 'application'
     id "com.github.johnrengelman.shadow" version "7.1.2"
+}
+
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 group 'org.example'
@@ -21,6 +28,12 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+
+application {
+    mainClass = 'server.Main'
+}
+
 
 shadowJar {
     archiveBaseName.set("server-test")

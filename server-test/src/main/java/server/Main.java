@@ -6,9 +6,13 @@ import one.nio.server.AcceptorConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 public class Main {
 
@@ -16,23 +20,25 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            URL shopsResource = Main.class.getClassLoader().getResource("shopsMock.txt");
-            if (shopsResource == null) {
-                LOGGER.error("Shops resources not get");
-                return;
-            }
-            URL brandsResources = Main.class.getClassLoader().getResource("brandsMock.txt");
-            if (brandsResources == null) {
-                LOGGER.error("Brands resources not get");
-                return;
-            }
 
-            String shops = Files.readString(Paths.get(shopsResource.toURI()));
-            String brands = Files.readString(Paths.get(brandsResources.toURI()));
+            String shops = readResource("shopsMock.txt");
+            String brands = readResource("brandsMock.txt");
             HttpServer server = new TestHttpServer(createConfigFromPort(8081), shops, brands);
             server.start();
         } catch (Exception e) {
             LOGGER.error(e);
+        }
+    }
+
+    private static String readResource(String name) throws IOException {
+        String line;
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(
+                Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream(name))))) {
+            StringBuilder response = new StringBuilder();
+            while ((line = br.readLine()) != null) {
+                response.append(line);
+            }
+            return response.toString();
         }
     }
 

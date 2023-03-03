@@ -1,13 +1,20 @@
 package org.storeparsers;
 
 import com.google.gson.JsonObject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Set;
 
 class ParserAuchanTest extends ParserTest {
+
+    @BeforeEach
+    void setLocale() {
+        Locale.setDefault(new Locale("en", "RU"));
+    }
 
     @Test
     void parseEnergyDrinkPage() throws IOException {

@@ -11,10 +11,6 @@ import java.util.Locale;
 import java.util.Set;
 
 public class ParserTest {
-    @BeforeEach
-    void setLocale() {
-        Locale.setDefault(new Locale("en", "RU"));
-    }
 
     String readTxtHtml(String fileName) throws IOException {
         StringBuilder response;

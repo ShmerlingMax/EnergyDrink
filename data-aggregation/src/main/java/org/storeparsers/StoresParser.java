@@ -50,18 +50,18 @@ public class StoresParser extends TimerTask {
             parserVkuster = new ParserVkuster("https://vkuster.ru/catalog/bezalkogolnye-napitki/energeticheskie-napitki/");
             parserOkey = new ParserOkey("https://www.okeydostavka.ru/spb/goriachie-i-kholodnye-napitki/energeticheskie-napitki");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("IOException when initialize parsers", e);
+            throw new RuntimeException();
         }
 
         try {
             parseShop("Parsing Vkuster", shopsArray, parserVkuster, brands);
-            parseShop("Parsing Okey", shopsArray, parserOkey, brands);
-            parseShop("Parsing Auchan", shopsArray, parserAuchan, brands);
-            parseShop("Parsing Lenta", shopsArray, parserLenta, brands);
-            parseShop("Parsing Perekresok", shopsArray, parserPerekrestok, brands);
+//            parseShop("Parsing Okey", shopsArray, parserOkey, brands);
+//            parseShop("Parsing Auchan", shopsArray, parserAuchan, brands);
+//            parseShop("Parsing Lenta", shopsArray, parserLenta, brands);
+//            parseShop("Parsing Perekresok", shopsArray, parserPerekrestok, brands);
         } catch (IOException e) {
             LOGGER.error("IOException In StoresParser", e);
-            throw new RuntimeException(e);
         }
 
 

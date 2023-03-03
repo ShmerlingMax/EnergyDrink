@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static server.Server.createConfigFromPort;
 
 public class IntegrationServerMongoDBTest {
@@ -59,32 +60,55 @@ public class IntegrationServerMongoDBTest {
 
     @Test
     public void getShops() throws Exception {
-        insertInDataBase(database, "shops", "[list shops]");
+        String expectedAns = "[list shops]";
+        insertInDataBase(database, "shops", expectedAns);
         Response response = client.get("/shops");
-        System.out.println("JOPA: " + new String(response.getBody()));
+        assertEquals( 200, response.getStatus(), "Get shops method should return good status!");
+        assertEquals(expectedAns, response.getBodyUtf8(), "Get shops method should return right doc");
     }
 
     @Test
     public void getBrands() throws Exception {
-        insertInDataBase(database, "brands", "[list brands]");
-        Response response = client.get("/shops");
-        System.out.println("JOPA: " + new String(response.getBody()));
+        String expectedAns = "[list brands]";
+        insertInDataBase(database, "brands", expectedAns);
+        Response response = client.get("/brands");
+        assertEquals(200, response.getStatus(), "Get brands method should return good status!");
+        assertEquals(expectedAns, response.getBodyUtf8(), "Get brands method should return right doc");
     }
 
     @Test
     public void getShopsBad() throws Exception {
-        //insertInDataBase(database, "shops", "[list shops]");
         Response response = client.get("/shops");
-        System.out.println("JOPA: " + new String(response.getBody()));
+        assertEquals(0, response.getBody().length, "Get shops method if doc empty, response should contains empty body");
+        assertEquals(404, response.getStatus(), "Get shops method if doc empty, response should has status 404 Not Found!");
     }
 
     @Test
     public void getBrandsBad() throws Exception {
-        //insertInDataBase(database, "brands", "[list brands]");
         Response response = client.get("/shops");
-        System.out.println("JOPA: " + response);
+        assertEquals(0, response.getBody().length, "Get brands method if not find doc, response should contains empty body");
+        assertEquals(404, response.getStatus(), "Get brands method if not find doc, response should has status 404 Not Found!");
     }
 
+    @Test
+    public void getShopsUpdateData() throws Exception {
+        String expectedAns = "[new list shops]";
+        insertInDataBase(database, "shops", "[list shops]");
+        insertInDataBase(database, "shops", expectedAns);
+        Response response = client.get("/shops");
+        assertEquals( 200, response.getStatus(), "Get shops method should return good status!");
+        assertEquals(expectedAns, response.getBodyUtf8(), "Get shops method should return right doc");
+    }
+
+    @Test
+    public void getBrandsUpdateData() throws Exception {
+        String expectedAns = "[new list brands]";
+        insertInDataBase(database, "brands", "[list brands]");
+        insertInDataBase(database, "brands", expectedAns);
+        Response response = client.get("/brands");
+        assertEquals(200, response.getStatus(), "Get brands method should return good status!");
+        assertEquals(expectedAns, response.getBodyUtf8(), "Get brands method should return right doc");
+    }
 
 
     private static void insertInDataBase(MongoDatabase database, String nameCollection, String json) {

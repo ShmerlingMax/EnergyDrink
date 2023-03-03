@@ -80,14 +80,14 @@ class HttpServerImplTest {
     @Test
     void handleHeadBrandsMethod() throws HttpException, IOException, PoolException, InterruptedException {
         Response response = client.head("/brands");
-        assertEquals(response.getStatus(), 200, "Head method /brands allowed, response should has status 200!");
+        assertEquals(200, response.getStatus(), "Head method /brands allowed, response should has status 200!");
         assertNull(response.getBody(), "Head method shouldn't have body");
     }
 
     @Test
     void handleHeadShopsMethod() throws HttpException, IOException, PoolException, InterruptedException {
         Response response = client.head("/shops");
-        assertEquals(response.getStatus(), 200, "Head method /shops allowed, response should has status 200!");
+        assertEquals(200, response.getStatus(), "Head method /shops allowed, response should has status 200!");
         assertNull(response.getBody(), "Head method shouldn't have body");
     }
 
@@ -96,7 +96,7 @@ class HttpServerImplTest {
         mockWorkWithMongo(HttpServerImpl.CollectionsMongoDb.SHOPS, null);
         Response response = client.get("/shops");
         assertEquals(0, response.getBody().length, "Get shops method if not find doc, response should contains empty body");
-        assertEquals(response.getStatus(), 404, "Get shops method if not find doc, response should has status 404 Not Found!");
+        assertEquals(404,response.getStatus(), "Get shops method if not find doc, response should has status 404 Not Found!");
     }
 
     @Test
@@ -104,7 +104,7 @@ class HttpServerImplTest {
         mockWorkWithMongo(HttpServerImpl.CollectionsMongoDb.BRANDS, new Document());
         Response response = client.get("/brands");
         assertEquals(0, response.getBody().length, "Get brands method if doc empty, response should contains empty body");
-        assertEquals(response.getStatus(), 404, "Get brands method if doc empty, response should has status 404 Not Found!");
+        assertEquals(404, response.getStatus(), "Get brands method if doc empty, response should has status 404 Not Found!");
     }
 
     @Test
@@ -112,7 +112,7 @@ class HttpServerImplTest {
         mockWorkWithMongo(HttpServerImpl.CollectionsMongoDb.BRANDS, null);
         Response response = client.get("/brands");
         assertEquals(0, response.getBody().length, "Get brands method if not find doc, response should contains empty body");
-        assertEquals(response.getStatus(), 404, "Get brands method if not find doc, response should has status 404 Not Found!");
+        assertEquals(404, response.getStatus(), "Get brands method if not find doc, response should has status 404 Not Found!");
     }
 
     @Test

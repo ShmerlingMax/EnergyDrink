@@ -4,17 +4,13 @@ jobs:
   integration_test:
     name: Integration test mobile app
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        api-level: [29]
-        target: [playstore]
     steps:
       - uses: actions/checkout@v2
       - uses: subosito/flutter-action@v1
       - uses: reactivecircus/android-emulator-runner@v2.27.0
         with:
-          target: google_apis
-          api-level: 29
+          target: playstore
+          api-level: 27
           arch: x86_64
           profile: Nexus 6
           working-directory: ./mobile_app

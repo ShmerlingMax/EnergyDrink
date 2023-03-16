@@ -14,7 +14,7 @@ jobs:
           arch: x86_64
           profile: Nexus 6
           working-directory: ./mobile_app
-          script: flutter test integration_test
+          script: flutter test integration_test -d emulator-5554
 #   test:
 #     name: Test mobile app
 #     runs-on: ubuntu-latest

@@ -3,7 +3,7 @@ on: push
 jobs:
   integration_test:
     name: Integration test mobile app
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         api-level: [29]
@@ -17,7 +17,7 @@ jobs:
           api-level: ${{ matrix.api-level }}
           arch: x86_64
           profile: Nexus 6
-          script: flutter test integration_test\script_5.dart
+          script: flutter test ./mobile_app/integration_test/script_5.dart
 #   test:
 #     name: Test mobile app
 #     runs-on: ubuntu-latest

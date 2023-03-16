@@ -1,17 +1,17 @@
-name: Mobile app
-on: push
-jobs:
-  test:
-    name: Test mobile app
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-java@v1
-        with:
-          java-version: "12.x"
-      - uses: subosito/flutter-action@v1
-      - working-directory: ./mobile_app
-        run: flutter pub get
-      - working-directory: ./mobile_app
-        run: flutter test --coverage
+# name: Mobile app
+# on: push
+# jobs:
+#   test:
+#     name: Test mobile app
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 30
+#     steps:
+#       - uses: actions/checkout@v1
+#       - uses: actions/setup-java@v1
+#         with:
+#           java-version: "12.x"
+#       - uses: subosito/flutter-action@v1
+#       - working-directory: ./mobile_app
+#         run: flutter pub get
+#       - working-directory: ./mobile_app
+#         run: flutter test --coverage

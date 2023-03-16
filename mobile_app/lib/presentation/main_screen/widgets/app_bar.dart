@@ -57,6 +57,7 @@ class MainAppBar extends StatelessWidget with PreferredSizeWidget {
           Flexible(
             flex: 2,
             child: GestureDetector(
+              key: const Key('settings_button'),
               onTap: () {
                 Navigator.push(
                   context,

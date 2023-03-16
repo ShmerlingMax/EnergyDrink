@@ -11,6 +11,7 @@ class SaveButton extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomRight,
       child: GestureDetector(
+        key: const Key('save_button'),
         onTap: () {
           final settings = context.read<Settings>();
           context.read<Aggregation>()

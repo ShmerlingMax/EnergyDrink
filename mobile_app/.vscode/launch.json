@@ -2,6 +2,12 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"name": "INTEFRATION_TEST",
+			"type": "dart",
+			"request": "launch",
+			"program": "integration_test/script_5.dart",
+		},
+		{
 			"name": "energy_drink",
 			"request": "launch",
 			"type": "dart",

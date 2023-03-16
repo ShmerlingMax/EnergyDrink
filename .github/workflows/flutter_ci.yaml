@@ -9,8 +9,8 @@ jobs:
       - uses: subosito/flutter-action@v1
       - uses: reactivecircus/android-emulator-runner@v2.27.0
         with:
-          target: playstore
-          api-level: 27
+          target: default
+          api-level: 21
           arch: x86_64
           profile: Nexus 6
           working-directory: ./mobile_app

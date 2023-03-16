@@ -1,17 +1,34 @@
 name: Mobile app
 on: push
 jobs:
-  test:
-    name: Test mobile app
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
+  integration_test:
+    name: Integration test mobile app
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        api-level: [29]
+        target: [playstore]
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-java@v1
-        with:
-          java-version: "12.x"
+      - uses: actions/checkout@v2
       - uses: subosito/flutter-action@v1
-      - working-directory: ./mobile_app
-        run: flutter pub get
-      - working-directory: ./mobile_app
-        run: flutter test --coverage
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          target: ${{ matrix.target }}
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          profile: Nexus 6
+          script: flutter test integration_test\script_5.dart
+#   test:
+#     name: Test mobile app
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 30
+#     steps:
+#       - uses: actions/checkout@v1
+#       - uses: actions/setup-java@v1
+#         with:
+#           java-version: "12.x"
+#       - uses: subosito/flutter-action@v1
+#       - working-directory: ./mobile_app
+#         run: flutter pub get
+#       - working-directory: ./mobile_app
+#         run: flutter test --coverage

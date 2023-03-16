@@ -9,15 +9,15 @@ jobs:
       - uses: subosito/flutter-action@v1
       - uses: reactivecircus/android-emulator-runner@v2.27.0
         with:
-          target: google_apis
+          target: default
           api-level: 21
           arch: x86_64
-          profile: pixel
+          profile: Nexus 6
           working-directory: ./mobile_app
           script: |
             flutter doctor -v
             flutter devices
-            flutter test integration_test -d emulator-5554
+            flutter test integration_test
 #   test:
 #     name: Test mobile app
 #     runs-on: ubuntu-latest

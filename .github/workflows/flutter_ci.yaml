@@ -10,7 +10,7 @@ jobs:
       - uses: reactivecircus/android-emulator-runner@v2.27.0
         with:
           target: google_apis
-          api-level: 30
+          api-level: 21
           arch: x86_64
           profile: pixel
           working-directory: ./mobile_app

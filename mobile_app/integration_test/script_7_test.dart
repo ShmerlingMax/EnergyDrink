@@ -17,14 +17,16 @@ void main() {
     test_app.main();
 
     await tester.pumpAndSettle();
-    await tester.pump(const Duration(seconds: 10));
+    await tester.pump(const Duration(seconds: 5));
 
     expect(find.byType(MainScreen), findsOneWidget);
 
     final settingsButton = find.byKey(const Key('settings_button'));
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
     await tester.tap(settingsButton);
     await tester.pumpAndSettle();
-    await tester.pump(const Duration(seconds: 10));
+    await tester.pump(const Duration(seconds: 5));
     expect(find.byType(SettingsScreen), findsOneWidget);
 
     final shopsCount =

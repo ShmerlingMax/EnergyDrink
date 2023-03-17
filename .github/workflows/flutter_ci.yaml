@@ -16,6 +16,7 @@ jobs:
         run: flutter test --coverage
 
   integration_test:
+    name: Integration test mobile app
     runs-on: macos-latest
 
     defaults:
@@ -57,6 +58,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
+          profile: Pixel 3a
           script: flutter test integration_test
           working-directory: ./mobile_app
 

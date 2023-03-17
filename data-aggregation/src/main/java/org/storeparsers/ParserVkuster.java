@@ -47,20 +47,21 @@ public class ParserVkuster extends Parser{
         HashMap<String, String> drinksNames = new HashMap<>();
         drinksNames.put("Gorilla", "Горилла");
         drinksNames.put("Adrenaline", "Адреналин");
-        boolean isDiscounted = false;
+        boolean isDiscounted = true;
 
         Element energyDrink = Jsoup.parse(html);
 
-        Elements oldPriceClass = energyDrink.select("span[class=\"good-discounted-price\"]");
+        Elements oldPriceClass = energyDrink.select("span[class=\"good-initial-price\"]");
         if (oldPriceClass.isEmpty()) {
-            isDiscounted = true;
+            isDiscounted = false;
+            oldPriceClass = energyDrink.select("span[class=\"good-discounted-price\"]");
         }
 
         String oldPrice = oldPriceClass.text();
         oldPrice = oldPrice.substring(0, oldPrice.length() - 2);
         String newPrice;
         if (isDiscounted) {
-            newPrice = energyDrink.select("span[class=\"product__price promo\"]").text();
+            newPrice = energyDrink.select("span[class=\"good-discounted-price\"]").text();
             newPrice = newPrice.replaceAll("\\s+", "");
             newPrice = newPrice.substring(0, newPrice.length() - 1);
         } else {

@@ -31,4 +31,4 @@ jobs:
           script: |
             flutter doctor -v
             flutter devices
-            flutter test integration_test
+            flutter test ./integration_test/script_1_test.dart

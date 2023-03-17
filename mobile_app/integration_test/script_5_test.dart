@@ -50,6 +50,10 @@ void main() {
 
     expect(find.byType(MainScreen), findsOneWidget);
     final energyDrinks = tester.widgetList<Item>(find.byType(Item));
+    final energy = find.byType(Item).last;
+    await tester.ensureVisible(energy);
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 3));
     expect(
       energyDrinks.isSorted(
         (a, b) => a.energyDrink.key.priceWithDiscount

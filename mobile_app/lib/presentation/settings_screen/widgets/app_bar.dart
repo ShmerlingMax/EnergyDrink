@@ -37,6 +37,7 @@ class SettingsAppBar extends StatelessWidget with PreferredSizeWidget {
             width: 110,
             color: const Color(0xFFB2C2D7),
             child: TextButton(
+              key: const Key('cancel_button'),
               onPressed: () {
                 final aggregation = context.read<Aggregation>();
                 context.read<Settings>().reset(

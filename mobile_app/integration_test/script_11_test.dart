@@ -4,7 +4,7 @@ import 'package:integration_test/integration_test.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('script_10', (tester) async {
+  testWidgets('script_11', (tester) async {
     
   });
 }

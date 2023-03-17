@@ -8,7 +8,7 @@ import 'package:energy_drink/domain/models/shop_model/shop_model.dart';
 import 'mock_dio_adapter.dart';
 
 class ApiConfig {
-  static var baseUrl = "http://84.252.129.177:8080";
+  static var baseUrl = "http://51.250.0.53:8080";
   static var brands = "/brands";
   static var shops = "/shops";
 }

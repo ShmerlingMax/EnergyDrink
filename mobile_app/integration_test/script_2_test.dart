@@ -1,6 +1,5 @@
 import 'package:energy_drink/presentation/main_screen/main_screen.dart';
 import 'package:energy_drink/presentation/main_screen/widgets/item.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:flutter/material.dart';

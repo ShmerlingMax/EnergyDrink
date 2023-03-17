@@ -5,7 +5,7 @@
 			"name": "INTEFRATION_TEST",
 			"type": "dart",
 			"request": "launch",
-			"program": "integration_test/script_5.dart",
+			"program": "integration_test",
 		},
 		{
 			"name": "energy_drink",

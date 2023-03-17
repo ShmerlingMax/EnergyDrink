@@ -9,6 +9,7 @@ void main() {
   runZonedGuarded<Future<void>>(
     () async {
       await SharedPrefService.init();
+      await SharedPrefService.sharedPref.clear();
       runApp(const MyApp());
     },
     (error, stack) => {},

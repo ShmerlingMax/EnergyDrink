@@ -1,0 +1,31 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "INTEFRATION_TEST",
+			"type": "dart",
+			"request": "launch",
+			"program": "integration_test",
+		},
+		{
+			"name": "energy_drink",
+			"request": "launch",
+			"type": "dart",
+			"preLaunchTask": "UnitTest"
+		},
+		{
+			"name": "energy_drink (profile mode)",
+			"request": "launch",
+			"type": "dart",
+			"flutterMode": "profile",
+			"preLaunchTask": "UnitTest"
+		},
+		{
+			"name": "energy_drink (release mode)",
+			"request": "launch",
+			"type": "dart",
+			"flutterMode": "release",
+			"preLaunchTask": "UnitTest"
+		}
+	]
+}

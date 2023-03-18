@@ -10,11 +10,13 @@ class SortingDirectionSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: DropdownButton<SortingDirection>(
+        key: const Key('sorting_direction_button'),
         isExpanded: true,
         value: context.watch<Settings>().sortingDirection,
         dropdownColor: const Color(0xFFB7D6FF),
         items: const [
           DropdownMenuItem(
+            key: Key('ascending_button'),
             value: SortingDirection.ascending,
             child: Text(
               'по возрастанию',
@@ -25,6 +27,7 @@ class SortingDirectionSelector extends StatelessWidget {
             ),
           ),
           DropdownMenuItem(
+            key: Key('descending_button'),
             value: SortingDirection.descending,
             child: Text(
               'по убыванию',

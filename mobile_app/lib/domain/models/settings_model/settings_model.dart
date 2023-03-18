@@ -1,7 +1,8 @@
 import 'package:energy_drink/domain/models/aggregation_model/aggregation_model.dart';
 import 'package:flutter/material.dart';
+import 'package:equatable/equatable.dart';
 
-class Settings with ChangeNotifier {
+class Settings extends Equatable with ChangeNotifier {
   List<String> _shops = [];
   List<String> _brands = [];
   SortingParameter _sortingParameter = SortingParameter.discount;
@@ -52,4 +53,12 @@ class Settings with ChangeNotifier {
     _sortingDirection = sortingDirection;
     notifyListeners();
   }
+
+  @override
+  List<Object> get props => [
+        _shops,
+        _brands,
+        _sortingParameter,
+        _sortingDirection,
+      ];
 }

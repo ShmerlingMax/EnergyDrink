@@ -46,6 +46,7 @@ class SelectionScreen extends StatelessWidget {
           Align(
             alignment: Alignment.bottomRight,
             child: GestureDetector(
+              key: const Key('apply_button'),
               onTap: (context.watch<SelectionModel>().shops.isEmpty ||
                       context.watch<SelectionModel>().brands.isEmpty)
                   ? null
@@ -91,6 +92,7 @@ class SelectAll extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      key: const Key('select_all_button'),
       onTap: () {
         final value = isShops
             ? context.read<SelectionModel>().shops.length ==

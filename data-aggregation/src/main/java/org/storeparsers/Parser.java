@@ -12,8 +12,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class Parser {
-    public abstract JsonObject parseStore(Set<String> brands) throws IOException;
+    public abstract JsonObject parseStore() throws IOException;
 
+    public abstract JsonObject parseEnergyDrinkPage(String html) throws IOException;
+    public abstract Set<String> getDrinksUrl(String html) throws IOException;
+
+    public final Set<String> brands = new HashSet<>();
     protected static final List<String> deleteFromTitle = Arrays.asList("напиток", "безалкогольный", "тонизирующий",
             "пастеризованный", "сильногазированный", "энергетический", "сильногаз.", "сильногаз", "газированный",
             "сильногазированныйированный", "негазированный", "л", "мл", "(энергетический)");
@@ -85,16 +89,24 @@ public abstract class Parser {
         }
     }
 
-    protected static void makeEnergyDrinkJsonObject(JsonArray eDrinks, JsonObject eDrink, String fullName, String brand, String imgLink, int volume, double oldPrice, double newPrice, double discount) throws IOException {
+    protected static JsonObject makeEnergyDrinkJsonObject(String fullName, String brand, String imgLink, int volume, double oldPrice, double newPrice, double discount) throws IOException {
+        JsonObject eDrink = new JsonObject();
+        String img;
+        try{
+            img = getCompressesImageBase64(new URL(imgLink));
+        }catch (FileNotFoundException c){
+            img = getCompressesImageBase64(new URL(defaultImageLink));
+        }
+
         eDrink.addProperty("fullName", removeWordsFromTitle(fullName));
         eDrink.addProperty("brand", brand);
-        eDrink.addProperty("image", getCompressesImageBase64(new URL(imgLink)));
+        eDrink.addProperty("image", img);
         eDrink.addProperty("volume", volume);
         eDrink.addProperty("priceWithDiscount", newPrice);
         eDrink.addProperty("priceWithOutDiscount", oldPrice);
         eDrink.addProperty("discount", discount);
 
-        eDrinks.add(eDrink);
+        return eDrink;
     }
 
     protected static String getHtmlCurl(String[] commands) throws IOException {
@@ -117,6 +129,13 @@ public abstract class Parser {
                 }
             } else if (command.contains("auchan") && !command.contains("main")) {
                 try(BufferedReader br = new BufferedReader(new InputStreamReader(StoresParser.class.getClassLoader().getResourceAsStream("auchandrinks.txt")))) {
+                    response = new StringBuilder();
+                    while ((line = br.readLine()) != null) {
+                        response.append(line).append("\n");
+                    }
+                }
+            } else if (command.contains("okey") && !command.contains("main")) {
+                try(BufferedReader br = new BufferedReader(new InputStreamReader(StoresParser.class.getClassLoader().getResourceAsStream("okeydrinks.txt")))) {
                     response = new StringBuilder();
                     while ((line = br.readLine()) != null) {
                         response.append(line).append("\n");

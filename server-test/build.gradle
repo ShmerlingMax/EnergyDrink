@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+    id 'application'
+    id "com.github.johnrengelman.shadow" version "7.1.2"
+}
+
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.slf4j:slf4j-api:2.0.0'
+    implementation 'ch.qos.logback:logback-classic:1.4.0'
+    implementation 'org.slf4j:log4j-over-slf4j:2.0.0'
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+    implementation 'ru.odnoklassniki:one-nio:1.5.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+
+application {
+    mainClass = 'server.Main'
+}
+
+
+shadowJar {
+    archiveBaseName.set("server-test")
+    archiveClassifier.set('shadow')
+    archiveVersion.set('0.0.1')
+}

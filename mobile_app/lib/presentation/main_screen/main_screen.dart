@@ -16,10 +16,10 @@ class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<MainScreen> createState() => MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class MainScreenState extends State<MainScreen> {
   late Future<List<Shop>> shops;
   late Future<List<String>> brands;
   @override
@@ -73,20 +73,6 @@ class _MainScreenState extends State<MainScreen> {
                     ],
                   ),
                 );
-                // final itemWidth = MediaQuery.of(context).size.width / 3;
-                // final itemHeight = MediaQuery.of(context).size.height / 4;
-                // return GridView.builder(
-                //   shrinkWrap: true,
-                //   itemCount: drinks.length,
-                //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                //     crossAxisCount: 2,
-                //     childAspectRatio: itemWidth / itemHeight,
-                //   ),
-                //   itemBuilder: (context, index) => Item(
-                //     drinks[index],
-                //     index,
-                //   ),
-                // );
               } else {
                 return const Center(
                   child: CircularProgressIndicator(),

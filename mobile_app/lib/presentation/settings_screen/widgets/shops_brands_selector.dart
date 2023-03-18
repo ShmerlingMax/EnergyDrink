@@ -32,11 +32,14 @@ class ShopsBrandsSelector extends StatelessWidget {
         ),
         Wrap(
           children: [
-            ...elements.map((e) => _Item(isShops, e)),
+            ...elements.map((e) => ShopsOrBrandsItem(isShops, e)),
             Container(
               color: const Color(0xFFB2C2D7),
               height: 32,
               child: GestureDetector(
+                key: isShops
+                    ? const Key('shops_add_button')
+                    : const Key('brands_add_button'),
                 onTap: () {
                   final settings = context.read<Settings>();
                   context.read<SelectionModel>().init(
@@ -74,11 +77,12 @@ class ShopsBrandsSelector extends StatelessWidget {
   }
 }
 
-class _Item extends StatelessWidget {
+class ShopsOrBrandsItem extends StatelessWidget {
   final bool isShops;
   final String text;
 
-  const _Item(this.isShops, this.text, {Key? key}) : super(key: key);
+  const ShopsOrBrandsItem(this.isShops, this.text, {Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -105,6 +109,9 @@ class _Item extends StatelessWidget {
                 ),
               ),
               GestureDetector(
+                key: isShops
+                    ? const Key('shop_delete_button')
+                    : const Key('brand_delete_button'),
                 onTap: () {
                   if (isShops) {
                     final newShops = context.read<Settings>().shops;

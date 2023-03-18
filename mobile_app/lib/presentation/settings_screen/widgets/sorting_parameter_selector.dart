@@ -12,6 +12,7 @@ class SortingParameterSelector extends StatelessWidget {
       children: [
         Flexible(
           child: GestureDetector(
+            key: const Key('sorting_parameter_price'),
             onTap: () => context.read<Settings>().sortingParameter =
                 SortingParameter.price,
             child: ListTile(

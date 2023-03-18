@@ -1,8 +1,7 @@
-name: Mobile app
+name: End-to-End 11 test mobile app
 on: workflow_dispatch
 jobs:
   end_to_end_test:
-    name: End-to-End 11 test mobile app
     runs-on: macos-latest
 
     defaults:

@@ -6,13 +6,13 @@ option java_outer_classname = "EnergyDrinksGrpcApi";
 
 
 message ShopsResponse {
-  repeated Shop sops = 1 [packed = true];
+  repeated Shop sops = 1;
 }
 
 message Shop {
   string name = 1;
   bytes image = 2;
-  repeated EnergyDrink energyDrinks = 3 [packed = true];
+  repeated EnergyDrink energyDrinks = 3;
 }
 
 message EnergyDrink {
@@ -30,7 +30,7 @@ message ShopsRequest {
 }
 
 message BrandsResponse {
-  repeated string brands = 1 [packed = true];
+  repeated string brands = 1;
 }
 
 message BrandsRequest {

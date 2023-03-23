@@ -1,0 +1,10 @@
+syntax = "proto3";
+package news.api;
+
+option java_package = "news.api";
+option java_outer_classname = "NewsParserGrpcApi";
+
+
+message Example {
+
+}

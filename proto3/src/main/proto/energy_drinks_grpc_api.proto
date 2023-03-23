@@ -1,10 +1,43 @@
 syntax = "proto3";
-package news.api;
+package api;
 
-option java_package = "news.api";
-option java_outer_classname = "NewsParserGrpcApi";
+option java_package = "api";
+option java_outer_classname = "EnergyDrinksGrpcApi";
 
 
-message Example {
+message ShopsResponse {
+  repeated Shop sops = 1 [packed = true];
+}
 
+message Shop {
+  string name = 1;
+  bytes image = 2;
+  repeated EnergyDrink energyDrinks = 3 [packed = true];
+}
+
+message EnergyDrink {
+  string name = 1;
+  string brand = 2;
+  bytes  image = 3;
+  uint32 volume = 4;
+  fixed32 priceWithDiscount = 5;
+  fixed32 priceWithoutDiscount = 6;
+  fixed32 discount = 7;
+}
+
+message ShopsRequest {
+  // fixme хз что в теле пока что
+}
+
+message BrandsResponse {
+  repeated string brands = 1 [packed = true];
+}
+
+message BrandsRequest {
+  // fixme хз что в теле пока что
+}
+
+service ServiceEnergyDrinks {
+  rpc ParseFeed(ShopsRequest) returns (ShopsResponse);
+  rpc ParseDoc(BrandsRequest) returns (BrandsResponse);
 }

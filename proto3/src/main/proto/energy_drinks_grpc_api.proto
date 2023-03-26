@@ -25,19 +25,15 @@ message EnergyDrink {
   fixed32 discount = 7;
 }
 
-message ShopsRequest {
-  // fixme хз что в теле пока что
-}
+message ShopsRequest {}
 
 message BrandsResponse {
   repeated string brands = 1;
 }
 
-message BrandsRequest {
-  // fixme хз что в теле пока что
-}
+message BrandsRequest {}
 
 service ServiceEnergyDrinks {
-  rpc ParseFeed(ShopsRequest) returns (ShopsResponse);
-  rpc ParseDoc(BrandsRequest) returns (BrandsResponse);
+  rpc GetShops(ShopsRequest) returns (ShopsResponse);
+  rpc GetBrands(BrandsRequest) returns (BrandsResponse);
 }

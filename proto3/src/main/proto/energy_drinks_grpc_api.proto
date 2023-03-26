@@ -1,0 +1,39 @@
+syntax = "proto3";
+package api;
+
+option java_package = "api";
+option java_outer_classname = "EnergyDrinksGrpcApi";
+
+
+message ShopsResponse {
+  repeated Shop sops = 1;
+}
+
+message Shop {
+  string name = 1;
+  bytes image = 2;
+  repeated EnergyDrink energyDrinks = 3;
+}
+
+message EnergyDrink {
+  string name = 1;
+  string brand = 2;
+  bytes  image = 3;
+  uint32 volume = 4;
+  fixed32 priceWithDiscount = 5;
+  fixed32 priceWithoutDiscount = 6;
+  fixed32 discount = 7;
+}
+
+message ShopsRequest {}
+
+message BrandsResponse {
+  repeated string brands = 1;
+}
+
+message BrandsRequest {}
+
+service ServiceEnergyDrinks {
+  rpc GetShops(ShopsRequest) returns (ShopsResponse);
+  rpc GetBrands(BrandsRequest) returns (BrandsResponse);
+}

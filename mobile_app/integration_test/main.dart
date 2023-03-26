@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  
   runZonedGuarded<Future<void>>(
     () async {
       await SharedPrefService.init();
